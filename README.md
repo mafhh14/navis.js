@@ -120,7 +120,7 @@ navis metrics
 - ✅ **LambdaHandler** - Optimized handler with warm-up support
 - ✅ **Cold start tracking** - Monitor and log cold start metrics
 
-### v4 (Current)
+### v4
 
 - ✅ **Advanced routing** - Route parameters (`:id`), nested routes, PATCH method
 - ✅ **Request validation** - Schema-based validation with comprehensive rules
@@ -128,6 +128,15 @@ navis metrics
 - ✅ **Authorization** - Role-based access control
 - ✅ **Rate limiting** - In-memory rate limiting with configurable windows
 - ✅ **Enhanced error handling** - Custom error classes and error handler middleware
+
+### v5 (Current)
+
+- ✅ **Caching layer** - In-memory cache with TTL and Redis adapter
+- ✅ **CORS support** - Cross-Origin Resource Sharing middleware
+- ✅ **Security headers** - Protection against common attacks
+- ✅ **Response compression** - Gzip and Brotli compression
+- ✅ **Health checks** - Liveness and readiness probes
+- ✅ **Graceful shutdown** - Clean shutdown handling
 
 ## API Reference
 
@@ -314,6 +323,7 @@ See the `examples/` directory:
 - `lambda.js` - AWS Lambda handler example
 - `lambda-optimized.js` - Optimized Lambda handler with cold start optimizations (v3.1)
 - `v4-features-demo.js` - v4 features demonstration (routing, validation, auth, rate limiting, etc.)
+- `v5-features-demo.js` - v5 features demonstration (caching, CORS, security, compression, health checks, etc.)
 - `service-client-demo.js` - ServiceClient usage example
 - `v2-features-demo.js` - v2 features demonstration (retry, circuit breaker, etc.)
 - `v3-features-demo.js` - v3 features demonstration (messaging, observability, etc.)
@@ -329,14 +339,18 @@ Resilience patterns: retry, circuit breaker, service discovery, CLI generators
 ### v3 ✅
 Advanced features: async messaging (SQS/Kafka/NATS), observability, enhanced CLI
 
-### v4 ✅ (Current)
+### v4 ✅
 Production-ready: advanced routing, validation, authentication, rate limiting, error handling
+
+### v5 ✅ (Current)
+Enterprise-grade: caching, CORS, security headers, compression, health checks, graceful shutdown
 
 ## Documentation
 
 - [V2 Features Guide](./V2_FEATURES.md) - Complete v2 features documentation
 - [V3 Features Guide](./V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./V4_FEATURES.md) - Complete v4 features documentation
+- [V5 Features Guide](./V5_FEATURES.md) - Complete v5 features documentation
 - [Lambda Optimization Guide](./LAMBDA_OPTIMIZATION.md) - Lambda cold start optimization guide (v3.1)
 - [Verification Guide v2](./VERIFY_V2.md) - How to verify v2 features
 - [Verification Guide v3](./VERIFY_V3.md) - How to verify v3 features

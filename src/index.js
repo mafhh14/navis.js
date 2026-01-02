@@ -47,6 +47,16 @@ const {
   notFoundHandler,
 } = require('./errors/error-handler');
 
+// v5: Enterprise Features
+const Cache = require('./cache/cache');
+const RedisCache = require('./cache/redis-cache');
+const cache = require('./middleware/cache-middleware');
+const cors = require('./middleware/cors');
+const security = require('./middleware/security');
+const compress = require('./middleware/compression');
+const { HealthChecker, createHealthChecker } = require('./health/health-checker');
+const gracefulShutdown = require('./core/graceful-shutdown');
+
 module.exports = {
   // Core
   NavisApp,
@@ -99,6 +109,17 @@ module.exports = {
   errorHandler,
   asyncHandler,
   notFoundHandler,
+  
+  // v5: Enterprise Features
+  Cache,
+  RedisCache,
+  cache,
+  cors,
+  security,
+  compress,
+  HealthChecker,
+  createHealthChecker,
+  gracefulShutdown,
   
   // Utilities
   response: {

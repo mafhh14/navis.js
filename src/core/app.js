@@ -238,6 +238,7 @@ class NavisApp {
    * Start HTTP server (Node.js)
    * @param {number} port - Port number
    * @param {Function} callback - Optional callback
+   * @returns {Object} - HTTP server instance
    */
   listen(port = 3000, callback) {
     this.server = http.createServer((req, res) => {
@@ -249,6 +250,14 @@ class NavisApp {
       console.log(`Navis.js server listening on port ${port}`);
     });
 
+    return this.server;
+  }
+
+  /**
+   * Get server instance
+   * @returns {Object|null} - HTTP server instance
+   */
+  getServer() {
     return this.server;
   }
 }
