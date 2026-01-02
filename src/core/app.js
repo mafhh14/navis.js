@@ -1,5 +1,6 @@
 ﻿const http = require('http');
 const Router = require('./router');
+const AdvancedRouter = require('./advanced-router');
 const { executeMiddleware } = require('./middleware');
 const { error: errorResponse } = require('../utils/response');
 
@@ -7,10 +8,13 @@ const { error: errorResponse } = require('../utils/response');
  * NavisApp - Main application class
  */
 class NavisApp {
-  constructor() {
-    this.router = new Router();
+  constructor(options = {}) {
+    // Use advanced router if enabled (v4)
+    this.useAdvancedRouter = options.useAdvancedRouter !== false; // Default true in v4
+    this.router = this.useAdvancedRouter ? new AdvancedRouter() : new Router();
     this.middlewares = [];
     this.server = null;
+    this.errorHandler = null;
   }
 
   /**
@@ -50,6 +54,25 @@ class NavisApp {
   }
 
   /**
+   * Register PATCH route (v4)
+   */
+  patch(path, handler) {
+    if (this.router.patch) {
+      this.router.patch(path, handler);
+    } else {
+      throw new Error('PATCH method requires advanced router');
+    }
+  }
+
+  /**
+   * Set error handler (v4)
+   * @param {Function} handler - Error handler function
+   */
+  setErrorHandler(handler) {
+    this.errorHandler = handler;
+  }
+
+  /**
    * Handle HTTP request (Node.js)
    * @param {Object} req - Node.js HTTP request
    * @param {Object} res - Node.js HTTP response
@@ -59,11 +82,36 @@ class NavisApp {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const path = url.pathname;
 
-    // Find route handler
-    const handler = this.router.find(method, path);
+    // Parse query string
+    req.query = {};
+    url.searchParams.forEach((value, key) => {
+      req.query[key] = value;
+    });
 
-    if (!handler) {
-      errorResponse(res, 'Not Found', 404);
+    // Find route handler
+    let routeResult;
+    if (this.useAdvancedRouter) {
+      routeResult = this.router.find(method, path);
+      if (routeResult) {
+        req.params = routeResult.params || {};
+        req.handler = routeResult.handler;
+      }
+    } else {
+      const handler = this.router.find(method, path);
+      if (handler) {
+        routeResult = { handler };
+        req.params = {};
+      }
+    }
+
+    if (!routeResult) {
+      if (this.errorHandler) {
+        const notFoundError = new Error('Not Found');
+        notFoundError.statusCode = 404;
+        await this.errorHandler(notFoundError, req, res, () => {});
+      } else {
+        errorResponse(res, 'Not Found', 404);
+      }
       return;
     }
 
@@ -73,11 +121,15 @@ class NavisApp {
         this.middlewares,
         req,
         res,
-        handler,
+        routeResult.handler,
         false
       );
     } catch (err) {
-      errorResponse(res, err.message || 'Internal Server Error', 500);
+      if (this.errorHandler) {
+        await this.errorHandler(err, req, res, () => {});
+      } else {
+        errorResponse(res, err.message || 'Internal Server Error', err.statusCode || 500);
+      }
     }
   }
 
@@ -91,9 +143,17 @@ class NavisApp {
     const path = event.path || event.rawPath || '/';
 
     // Find route handler
-    const handler = this.router.find(method, path);
+    let routeResult;
+    if (this.useAdvancedRouter) {
+      routeResult = this.router.find(method, path);
+    } else {
+      const handler = this.router.find(method, path);
+      if (handler) {
+        routeResult = { handler, params: {} };
+      }
+    }
 
-    if (!handler) {
+    if (!routeResult) {
       return {
         statusCode: 404,
         headers: {
@@ -108,8 +168,9 @@ class NavisApp {
       method,
       path,
       headers: event.headers || {},
-      body: event.body ? JSON.parse(event.body) : {},
+      body: event.body ? (typeof event.body === 'string' ? JSON.parse(event.body) : event.body) : {},
       query: event.queryStringParameters || {},
+      params: routeResult.params || {},
       // Store original event for advanced use cases
       event,
     };
@@ -126,7 +187,7 @@ class NavisApp {
         this.middlewares,
         req,
         res,
-        handler,
+        routeResult.handler,
         true
       );
 
@@ -145,8 +206,26 @@ class NavisApp {
         body: res.body ? JSON.stringify(res.body) : JSON.stringify(result || {}),
       };
     } catch (err) {
+      // Use error handler if set
+      if (this.errorHandler) {
+        // Create a mock res object for error handler
+        const errorRes = {
+          statusCode: err.statusCode || 500,
+          headers: { 'Content-Type': 'application/json' },
+          body: null,
+        };
+        
+        await this.errorHandler(err, req, errorRes, () => {});
+        
+        return {
+          statusCode: errorRes.statusCode,
+          headers: errorRes.headers,
+          body: typeof errorRes.body === 'string' ? errorRes.body : JSON.stringify(errorRes.body || { error: err.message }),
+        };
+      }
+
       return {
-        statusCode: 500,
+        statusCode: err.statusCode || 500,
         headers: {
           'Content-Type': 'application/json',
         },

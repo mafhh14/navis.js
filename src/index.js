@@ -22,6 +22,31 @@ const { LazyInit, createLazyInit } = require('./utils/lazy-init');
 const LambdaHandler = require('./core/lambda-handler');
 const { coldStartTracker } = require('./middleware/cold-start-tracker');
 
+// v4: Advanced Features
+const AdvancedRouter = require('./core/advanced-router');
+const { validate, ValidationError } = require('./validation/validator');
+const {
+  authenticateJWT,
+  authenticateAPIKey,
+  authorize,
+  optionalAuth,
+  AuthenticationError,
+  AuthorizationError,
+} = require('./auth/authenticator');
+const { rateLimit, RateLimiter } = require('./middleware/rate-limiter');
+const {
+  AppError,
+  NotFoundError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  ConflictError,
+  InternalServerError,
+  errorHandler,
+  asyncHandler,
+  notFoundHandler,
+} = require('./errors/error-handler');
+
 module.exports = {
   // Core
   NavisApp,
@@ -51,6 +76,29 @@ module.exports = {
   createLazyInit,
   LambdaHandler,
   coldStartTracker,
+  
+  // v4: Advanced Features
+  AdvancedRouter,
+  validate,
+  ValidationError,
+  authenticateJWT,
+  authenticateAPIKey,
+  authorize,
+  optionalAuth,
+  AuthenticationError,
+  AuthorizationError,
+  rateLimit,
+  RateLimiter,
+  AppError,
+  NotFoundError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  ConflictError,
+  InternalServerError,
+  errorHandler,
+  asyncHandler,
+  notFoundHandler,
   
   // Utilities
   response: {

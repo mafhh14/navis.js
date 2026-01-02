@@ -112,13 +112,22 @@ navis metrics
 - ✅ **Distributed tracing** - Trace and span management
 - ✅ **Enhanced CLI** - Test and metrics commands
 
-### v3.1 (Current)
+### v3.1
 
 - ✅ **Lambda cold start optimization** - Connection pooling, lazy initialization
 - ✅ **ServiceClientPool** - Reuse HTTP connections across invocations
 - ✅ **LazyInit utility** - Defer heavy operations until needed
 - ✅ **LambdaHandler** - Optimized handler with warm-up support
 - ✅ **Cold start tracking** - Monitor and log cold start metrics
+
+### v4 (Current)
+
+- ✅ **Advanced routing** - Route parameters (`:id`), nested routes, PATCH method
+- ✅ **Request validation** - Schema-based validation with comprehensive rules
+- ✅ **Authentication** - JWT and API Key authentication
+- ✅ **Authorization** - Role-based access control
+- ✅ **Rate limiting** - In-memory rate limiting with configurable windows
+- ✅ **Enhanced error handling** - Custom error classes and error handler middleware
 
 ## API Reference
 
@@ -304,6 +313,7 @@ See the `examples/` directory:
 - `server.js` - Node.js HTTP server example
 - `lambda.js` - AWS Lambda handler example
 - `lambda-optimized.js` - Optimized Lambda handler with cold start optimizations (v3.1)
+- `v4-features-demo.js` - v4 features demonstration (routing, validation, auth, rate limiting, etc.)
 - `service-client-demo.js` - ServiceClient usage example
 - `v2-features-demo.js` - v2 features demonstration (retry, circuit breaker, etc.)
 - `v3-features-demo.js` - v3 features demonstration (messaging, observability, etc.)
@@ -316,13 +326,17 @@ Core functionality: routing, middleware, Lambda support, ServiceClient
 ### v2 ✅
 Resilience patterns: retry, circuit breaker, service discovery, CLI generators
 
-### v3 ✅ (Current)
+### v3 ✅
 Advanced features: async messaging (SQS/Kafka/NATS), observability, enhanced CLI
+
+### v4 ✅ (Current)
+Production-ready: advanced routing, validation, authentication, rate limiting, error handling
 
 ## Documentation
 
 - [V2 Features Guide](./V2_FEATURES.md) - Complete v2 features documentation
 - [V3 Features Guide](./V3_FEATURES.md) - Complete v3 features documentation
+- [V4 Features Guide](./V4_FEATURES.md) - Complete v4 features documentation
 - [Lambda Optimization Guide](./LAMBDA_OPTIMIZATION.md) - Lambda cold start optimization guide (v3.1)
 - [Verification Guide v2](./VERIFY_V2.md) - How to verify v2 features
 - [Verification Guide v3](./VERIFY_V3.md) - How to verify v3 features
