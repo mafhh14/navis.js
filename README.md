@@ -72,6 +72,24 @@ exports.handler = async (event) => {
 };
 ```
 
+### TypeScript
+
+```typescript
+import { NavisApp, response } from 'navis.js';
+
+const app = new NavisApp();
+
+app.get('/', (req, res) => {
+  response.success(res, { 
+    message: 'Hello from Navis.js with TypeScript!'
+  });
+});
+
+app.listen(3000);
+```
+
+See `examples/server.ts` and `examples/typescript-features-demo.ts` for complete TypeScript examples.
+
 ## CLI
 
 ```bash
@@ -142,18 +160,24 @@ navis metrics
 - ✅ **Health checks** - Liveness and readiness probes
 - ✅ **Graceful shutdown** - Clean shutdown handling
 
-### v5.1 (Current)
+### v5.1
 
 - ✅ **OpenAPI/Swagger** - Auto-generate API documentation
 - ✅ **API versioning** - URL-based and header-based versioning
 - ✅ **File upload** - Multipart form data handling
 - ✅ **Testing utilities** - Test helpers for applications
 
-### v5.2 (Current)
+### v5.2
 
 - ✅ **WebSocket support** - Real-time bidirectional communication
 - ✅ **Server-Sent Events** - One-way real-time streaming
 - ✅ **Database integration** - Connection pooling for PostgreSQL, MySQL, MongoDB
+
+### v5.3 (Current)
+
+- ✅ **TypeScript support** - Full type definitions for all features
+- ✅ **Type-safe API** - Complete IntelliSense and type checking
+- ✅ **TypeScript examples** - Ready-to-use TypeScript examples
 
 ## API Reference
 
@@ -337,13 +361,18 @@ exports.handler = async (event, context) => {
 See the `examples/` directory:
 
 - `server.js` - Node.js HTTP server example
+- `server.ts` - TypeScript HTTP server example (v5.3)
 - `lambda.js` - AWS Lambda handler example
+- `lambda.ts` - TypeScript Lambda handler example (v5.3)
 - `lambda-optimized.js` - Optimized Lambda handler with cold start optimizations (v3.1)
-- `v4-features-demo.js` - v4 features demonstration (routing, validation, auth, rate limiting, etc.)
-- `v5-features-demo.js` - v5 features demonstration (caching, CORS, security, compression, health checks, etc.)
-- `service-client-demo.js` - ServiceClient usage example
+- `typescript-features-demo.ts` - Complete TypeScript features demonstration (v5.3)
 - `v2-features-demo.js` - v2 features demonstration (retry, circuit breaker, etc.)
 - `v3-features-demo.js` - v3 features demonstration (messaging, observability, etc.)
+- `v4-features-demo.js` - v4 features demonstration (routing, validation, auth, rate limiting, etc.)
+- `v5-features-demo.js` - v5 features demonstration (caching, CORS, security, compression, health checks, etc.)
+- `v5.1-features-demo.js` - v5.1 features demonstration (Swagger, versioning, upload, testing)
+- `v5.2-features-demo.js` - v5.2 features demonstration (WebSocket, SSE, database)
+- `service-client-demo.js` - ServiceClient usage example
 
 ## Roadmap
 
@@ -365,8 +394,11 @@ Enterprise-grade: caching, CORS, security headers, compression, health checks, g
 ### v5.1 ✅
 Developer experience: OpenAPI/Swagger, API versioning, file upload, testing utilities
 
-### v5.2 ✅ (Current)
+### v5.2 ✅
 Real-time features: WebSocket, Server-Sent Events, database integration
+
+### v5.3 ✅ (Current)
+TypeScript support: Full type definitions, type-safe API, IntelliSense
 
 ## What's Next?
 
@@ -385,6 +417,7 @@ Future versions may include:
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation
 - [V5.1 Features Guide](./docs/V5.1_FEATURES.md) - Complete v5.1 features documentation
 - [V5.2 Features Guide](./docs/V5.2_FEATURES.md) - Complete v5.2 features documentation
+- [TypeScript Guide](./docs/TYPESCRIPT.md) - Complete TypeScript support documentation (v5.3)
 - [Lambda Optimization Guide](./docs/LAMBDA_OPTIMIZATION.md) - Lambda cold start optimization guide (v3.1)
 - [Verification Guide v2](./docs/VERIFY_V2.md) - How to verify v2 features
 - [Verification Guide v3](./docs/VERIFY_V3.md) - How to verify v3 features
