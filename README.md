@@ -76,6 +76,12 @@ navis start
 
 # Generate a new microservice (v2)
 navis generate service my-service
+
+# Run verification tests (v3)
+navis test
+
+# Show metrics endpoint info (v3)
+navis metrics
 ```
 
 ## Features
@@ -89,7 +95,7 @@ navis generate service my-service
 - ✅ ServiceClient for service-to-service calls
 - ✅ Timeout support
 
-### v2 (Current)
+### v2
 
 - ✅ **Retry logic** - Automatic retry with exponential backoff
 - ✅ **Circuit breaker** - Prevents cascading failures
@@ -98,11 +104,13 @@ navis generate service my-service
 - ✅ **Additional HTTP methods** - PUT, DELETE, PATCH support
 - ✅ **CLI generators** - `navis generate service` command
 
-### v3 (Planned)
+### v3 (Current)
 
-- 🔄 Async messaging (SQS / Kafka / NATS)
-- 🔄 Advanced observability
-- 🔄 Enhanced CLI features
+- ✅ **Async messaging** - SQS, Kafka, and NATS adapters
+- ✅ **Structured logging** - Multi-level logging with context
+- ✅ **Metrics collection** - Counters, gauges, histograms with Prometheus export
+- ✅ **Distributed tracing** - Trace and span management
+- ✅ **Enhanced CLI** - Test and metrics commands
 
 ## API Reference
 
@@ -192,6 +200,54 @@ response.success(res, { data: 'value' }, 200);
 response.error(res, 'Error message', 500);
 ```
 
+### Observability (v3)
+
+```javascript
+const { Logger, Metrics, Tracer } = require('navis.js');
+
+// Structured logging
+const logger = new Logger({ level: 'INFO', context: { service: 'api' } });
+logger.info('User logged in', { userId: 123 });
+
+// Metrics collection
+const metrics = new Metrics();
+metrics.increment('api_calls', 1, { endpoint: '/users' });
+metrics.recordRequest('GET', '/users', 150, 200);
+
+// Expose Prometheus metrics
+app.get('/metrics', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain');
+  res.end(metrics.toPrometheus());
+});
+
+// Distributed tracing
+const tracer = new Tracer({ serviceName: 'api' });
+const traceId = tracer.startTrace('user-operation');
+const spanId = tracer.startSpan('db-query', { traceId });
+tracer.finishSpan(spanId, { status: 'ok' });
+```
+
+### Async Messaging (v3)
+
+```javascript
+const { SQSMessaging, KafkaMessaging, NATSMessaging } = require('navis.js');
+
+// AWS SQS (requires @aws-sdk/client-sqs)
+const sqs = new SQSMessaging({ region: 'us-east-1' });
+await sqs.connect();
+await sqs.publish(queueUrl, { userId: 123, action: 'user.created' });
+
+// Kafka (requires kafkajs)
+const kafka = new KafkaMessaging({ brokers: ['localhost:9092'] });
+await kafka.connect();
+await kafka.publish('user-events', { userId: 123, event: 'created' });
+
+// NATS (requires nats)
+const nats = new NATSMessaging({ servers: ['nats://localhost:4222'] });
+await nats.connect();
+await nats.publish('user.created', { userId: 123 });
+```
+
 ## Examples
 
 See the `examples/` directory:
@@ -200,22 +256,25 @@ See the `examples/` directory:
 - `lambda.js` - AWS Lambda handler example
 - `service-client-demo.js` - ServiceClient usage example
 - `v2-features-demo.js` - v2 features demonstration (retry, circuit breaker, etc.)
+- `v3-features-demo.js` - v3 features demonstration (messaging, observability, etc.)
 
 ## Roadmap
 
 ### v1 ✅
 Core functionality: routing, middleware, Lambda support, ServiceClient
 
-### v2 ✅ (Current)
+### v2 ✅
 Resilience patterns: retry, circuit breaker, service discovery, CLI generators
 
-### v3 (Future)
+### v3 ✅ (Current)
 Advanced features: async messaging (SQS/Kafka/NATS), observability, enhanced CLI
 
 ## Documentation
 
 - [V2 Features Guide](./V2_FEATURES.md) - Complete v2 features documentation
-- [Verification Guide](./VERIFY_V2.md) - How to verify all features
+- [V3 Features Guide](./V3_FEATURES.md) - Complete v3 features documentation
+- [Verification Guide v2](./VERIFY_V2.md) - How to verify v2 features
+- [Verification Guide v3](./VERIFY_V3.md) - How to verify v3 features
 
 ## License
 
