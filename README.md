@@ -362,11 +362,20 @@ Production-ready: advanced routing, validation, authentication, rate limiting, e
 ### v5 ✅
 Enterprise-grade: caching, CORS, security headers, compression, health checks, graceful shutdown
 
-### v5.1 ✅ (Current)
+### v5.1 ✅
 Developer experience: OpenAPI/Swagger, API versioning, file upload, testing utilities
 
 ### v5.2 ✅ (Current)
 Real-time features: WebSocket, Server-Sent Events, database integration
+
+## What's Next?
+
+Future versions may include:
+- GraphQL support
+- gRPC integration
+- Advanced caching strategies
+- More database adapters
+- Enhanced monitoring and alerting
 
 ## Documentation
 
