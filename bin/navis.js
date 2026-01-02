@@ -1,6 +1,4 @@
-﻿#!/usr/bin/env node
-
-/**
+﻿/**
  * Navis.js CLI
  * v1: Basic start command
  */
