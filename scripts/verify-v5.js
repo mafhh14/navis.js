@@ -208,7 +208,7 @@ test('Cache Middleware - Function exists', () => {
 
 // Test 15: Module Exports
 test('Module exports - All v5 features exported', () => {
-  const navis = require('./src/index');
+  const navis = require('../src/index');
   
   if (!navis.Cache) {
     throw new Error('Cache not exported');

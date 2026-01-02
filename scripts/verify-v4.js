@@ -245,7 +245,7 @@ test('NavisApp - PATCH method', () => {
 
 // Test 15: Module Exports
 test('Module exports - All v4 features exported', () => {
-  const navis = require('./src/index');
+  const navis = require('../src/index');
   
   if (!navis.AdvancedRouter) {
     throw new Error('AdvancedRouter not exported');

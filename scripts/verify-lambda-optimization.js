@@ -277,7 +277,7 @@ test('coldStartTracker - Middleware function', () => {
 
 // Test 16: Module exports
 test('Module exports - All Lambda optimization features exported', () => {
-  const navis = require('./src/index');
+  const navis = require('../src/index');
   
   if (!navis.ServiceClientPool) {
     throw new Error('ServiceClientPool not exported');

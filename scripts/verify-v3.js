@@ -302,7 +302,7 @@ test('NATSMessaging - Instantiation', () => {
 
 // Test 16: Module exports
 test('Module exports - All v3 features exported', () => {
-  const navis = require('./src/index');
+  const navis = require('../src/index');
   
   if (!navis.Logger) {
     throw new Error('Logger not exported');

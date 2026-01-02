@@ -261,7 +261,7 @@ test('ServiceClient - Circuit breaker state methods', () => {
 
 // Test 11: Exports verification
 test('Module exports - All v2 features exported', () => {
-  const navis = require('./src/index');
+  const navis = require('../src/index');
   
   if (!navis.ServiceClient) {
     throw new Error('ServiceClient not exported');
