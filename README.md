@@ -2,16 +2,20 @@
 
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
-**Author:** Syed Imran Ali
+**Author:** Syed Imran Ali  
+**Version:** 5.2.1  
+**License:** MIT
 
 ## Philosophy
 
 Navis.js is "Express for serverless microservices — but simpler."
 
 - **Extremely lightweight** - Zero or minimal dependencies
-- **Serverless-first** - Built for AWS Lambda
+- **Serverless-first** - Built for AWS Lambda with cold start optimizations
 - **Microservice-friendly** - API-to-API communication made easy
 - **Simple & readable** - No magic abstractions
+- **Production-ready** - Enterprise features included (caching, security, observability)
+- **Developer-friendly** - OpenAPI docs, testing utilities, and comprehensive tooling
 
 ## Installation
 
