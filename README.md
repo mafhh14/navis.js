@@ -112,6 +112,14 @@ navis metrics
 - ✅ **Distributed tracing** - Trace and span management
 - ✅ **Enhanced CLI** - Test and metrics commands
 
+### v3.1 (Current)
+
+- ✅ **Lambda cold start optimization** - Connection pooling, lazy initialization
+- ✅ **ServiceClientPool** - Reuse HTTP connections across invocations
+- ✅ **LazyInit utility** - Defer heavy operations until needed
+- ✅ **LambdaHandler** - Optimized handler with warm-up support
+- ✅ **Cold start tracking** - Monitor and log cold start metrics
+
 ## API Reference
 
 ### NavisApp
@@ -248,12 +256,54 @@ await nats.connect();
 await nats.publish('user.created', { userId: 123 });
 ```
 
+### Lambda Optimization (v3.1)
+
+```javascript
+const {
+  NavisApp,
+  getPool,
+  LambdaHandler,
+  coldStartTracker,
+  LazyInit,
+} = require('navis.js');
+
+// Initialize app OUTSIDE handler (reused across invocations)
+const app = new NavisApp();
+app.use(coldStartTracker);
+
+// Connection pooling - reuse HTTP connections
+const client = getPool().get('http://api.example.com', {
+  timeout: 3000,
+  maxRetries: 2,
+});
+
+// Lazy initialization - defer heavy operations
+const dbConnection = new LazyInit();
+app.get('/users', async (req, res) => {
+  const db = await dbConnection.init(async () => {
+    return await connectToDatabase(); // Only runs once
+  });
+  res.body = await db.query('SELECT * FROM users');
+});
+
+// Optimized Lambda handler
+const handler = new LambdaHandler(app, {
+  enableMetrics: true,
+  warmupPath: '/warmup',
+});
+
+exports.handler = async (event, context) => {
+  return await handler.handle(event, context);
+};
+```
+
 ## Examples
 
 See the `examples/` directory:
 
 - `server.js` - Node.js HTTP server example
 - `lambda.js` - AWS Lambda handler example
+- `lambda-optimized.js` - Optimized Lambda handler with cold start optimizations (v3.1)
 - `service-client-demo.js` - ServiceClient usage example
 - `v2-features-demo.js` - v2 features demonstration (retry, circuit breaker, etc.)
 - `v3-features-demo.js` - v3 features demonstration (messaging, observability, etc.)
@@ -273,6 +323,7 @@ Advanced features: async messaging (SQS/Kafka/NATS), observability, enhanced CLI
 
 - [V2 Features Guide](./V2_FEATURES.md) - Complete v2 features documentation
 - [V3 Features Guide](./V3_FEATURES.md) - Complete v3 features documentation
+- [Lambda Optimization Guide](./LAMBDA_OPTIMIZATION.md) - Lambda cold start optimization guide (v3.1)
 - [Verification Guide v2](./VERIFY_V2.md) - How to verify v2 features
 - [Verification Guide v3](./VERIFY_V3.md) - How to verify v3 features
 

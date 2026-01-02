@@ -1,0 +1,13 @@
+{
+  "name": "my-service",
+  "version": "1.0.0",
+  "description": "my-service microservice",
+  "main": "service.js",
+  "scripts": {
+    "start": "node service.js",
+    "start:lambda": "node lambda.js"
+  },
+  "dependencies": {
+    "navis.js": "^1.0.0"
+  }
+}

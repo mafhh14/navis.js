@@ -16,6 +16,12 @@ const Logger = require('./observability/logger');
 const Metrics = require('./observability/metrics');
 const Tracer = require('./observability/tracer');
 
+// v3.1: Lambda Optimizations
+const { getPool, ServiceClientPool } = require('./utils/service-client-pool');
+const { LazyInit, createLazyInit } = require('./utils/lazy-init');
+const LambdaHandler = require('./core/lambda-handler');
+const { coldStartTracker } = require('./middleware/cold-start-tracker');
+
 module.exports = {
   // Core
   NavisApp,
@@ -37,6 +43,14 @@ module.exports = {
   Logger,
   Metrics,
   Tracer,
+  
+  // v3.1: Lambda Optimizations
+  ServiceClientPool,
+  getPool,
+  LazyInit,
+  createLazyInit,
+  LambdaHandler,
+  coldStartTracker,
   
   // Utilities
   response: {
