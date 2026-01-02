@@ -15,18 +15,31 @@ Navis.js is "Express for serverless microservices — but simpler."
 
 ## Installation
 
+### Via npm
+
+```bash
+npm install navis.js
+```
+
+### From GitHub
+
+```bash
 # Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/mafhh14/navis.js.git
 cd navis.js
 
 # Install dependencies (if any)
 npm install
 
 # Link CLI locally for development
-npm link## Quick Start
+npm link
+```
+
+## Quick Start
 
 ### Node.js HTTP Server
-cript
+
+```javascript
 const { NavisApp, response } = require('navis.js');
 
 const app = new NavisApp();
@@ -36,8 +49,11 @@ app.get('/', (req, res) => {
 });
 
 app.listen(3000);
+```
+
 ### AWS Lambda
-t
+
+```javascript
 const { NavisApp } = require('navis.js');
 
 const app = new NavisApp();
@@ -49,10 +65,17 @@ app.get('/hello', (req, res) => {
 
 exports.handler = async (event) => {
   return await app.handleLambda(event);
-};## CLI
+};
+```
 
+## CLI
+
+```bash
 # Start example server
-navis start## Features
+navis start
+```
+
+## Features
 
 ### v1 (Current)
 
@@ -98,15 +121,22 @@ const client = new ServiceClient('http://api.example.com', {
 const response = await client.get('/users');
 
 // POST request
-const result = await client.post('/users', { name: 'John' });### Response Helpers
+const result = await client.post('/users', { name: 'John' });
+```
 
+### Response Helpers
+
+```javascript
 const { response } = require('navis.js');
 
 // Success response
 response.success(res, { data: 'value' }, 200);
 
 // Error response
-response.error(res, 'Error message', 500);## Examples
+response.error(res, 'Error message', 500);
+```
+
+## Examples
 
 See the `examples/` directory:
 

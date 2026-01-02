@@ -1,23 +1,45 @@
-﻿{
+{
   "name": "navis.js",
   "version": "1.0.0",
-  "description": "A lightweight, serverless-first, microservice API framework",
+  "description": "A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js",
   "main": "src/index.js",
   "bin": {
-    "navis": "./bin/navis.js"
+    "navis": "bin/navis.js"
   },
+  "files": [
+    "src/",
+    "bin/",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node examples/server.js"
   },
   "keywords": [
     "serverless",
     "lambda",
+    "aws-lambda",
     "microservice",
     "api",
-    "framework"
+    "framework",
+    "express",
+    "http",
+    "routing",
+    "middleware",
+    "nodejs"
   ],
   "author": "Syed Iman Ali",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mafhh14/navis.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mafhh14/navis.js/issues"
+  },
+  "homepage": "https://github.com/mafhh14/navis.js#readme",
   "engines": {
     "node": ">=14.0.0"
   }
