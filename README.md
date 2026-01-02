@@ -366,15 +366,15 @@ Real-time features: WebSocket, Server-Sent Events, database integration
 
 ## Documentation
 
-- [V2 Features Guide](./V2_FEATURES.md) - Complete v2 features documentation
-- [V3 Features Guide](./V3_FEATURES.md) - Complete v3 features documentation
-- [V4 Features Guide](./V4_FEATURES.md) - Complete v4 features documentation
-- [V5 Features Guide](./V5_FEATURES.md) - Complete v5 features documentation
-- [V5.1 Features Guide](./V5.1_FEATURES.md) - Complete v5.1 features documentation
-- [V5.2 Features Guide](./V5.2_FEATURES.md) - Complete v5.2 features documentation
-- [Lambda Optimization Guide](./LAMBDA_OPTIMIZATION.md) - Lambda cold start optimization guide (v3.1)
-- [Verification Guide v2](./VERIFY_V2.md) - How to verify v2 features
-- [Verification Guide v3](./VERIFY_V3.md) - How to verify v3 features
+- [V2 Features Guide](./docs/V2_FEATURES.md) - Complete v2 features documentation
+- [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
+- [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
+- [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation
+- [V5.1 Features Guide](./docs/V5.1_FEATURES.md) - Complete v5.1 features documentation
+- [V5.2 Features Guide](./docs/V5.2_FEATURES.md) - Complete v5.2 features documentation
+- [Lambda Optimization Guide](./docs/LAMBDA_OPTIMIZATION.md) - Lambda cold start optimization guide (v3.1)
+- [Verification Guide v2](./docs/VERIFY_V2.md) - How to verify v2 features
+- [Verification Guide v3](./docs/VERIFY_V3.md) - How to verify v3 features
 
 ## License
 
