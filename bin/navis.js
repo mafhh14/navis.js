@@ -33,8 +33,26 @@ if (command === 'start') {
     process.exit(code);
   });
 } else if (command === 'generate') {
-  // TODO v2: Implement navis generate service
-  console.log('Generator commands coming in v2');
+  const subcommand = process.argv[3];
+  
+  if (subcommand === 'service') {
+    const serviceName = process.argv[4];
+    
+    if (!serviceName) {
+      console.error('Error: Service name is required');
+      console.log('Usage: navis generate service <service-name>');
+      process.exit(1);
+    }
+    
+    const { generateService } = require('./generators/service');
+    generateService(serviceName);
+  } else {
+    console.log('Generator commands:');
+    console.log('  navis generate service <name>    Generate a new microservice');
+    console.log('');
+    console.log('Example:');
+    console.log('  navis generate service user-service');
+  }
 } else {
   console.log('Navis.js CLI');
   console.log('');

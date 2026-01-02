@@ -73,11 +73,14 @@ exports.handler = async (event) => {
 ```bash
 # Start example server
 navis start
+
+# Generate a new microservice (v2)
+navis generate service my-service
 ```
 
 ## Features
 
-### v1 (Current)
+### v1
 
 - ✅ HTTP routing (GET, POST, PUT, DELETE)
 - ✅ Middleware support (`app.use()`)
@@ -86,14 +89,20 @@ navis start
 - ✅ ServiceClient for service-to-service calls
 - ✅ Timeout support
 
-### v2 (Planned)
+### v2 (Current)
 
-- 🔄 Retry logic
-- 🔄 Circuit breaker
-- 🔄 Config-based services
-- 🔄 Service discovery
+- ✅ **Retry logic** - Automatic retry with exponential backoff
+- ✅ **Circuit breaker** - Prevents cascading failures
+- ✅ **Config-based services** - Centralized service configuration
+- ✅ **Service discovery** - Health checks and load balancing
+- ✅ **Additional HTTP methods** - PUT, DELETE, PATCH support
+- ✅ **CLI generators** - `navis generate service` command
+
+### v3 (Planned)
+
 - 🔄 Async messaging (SQS / Kafka / NATS)
-- 🔄 CLI generators (`navis generate service`)
+- 🔄 Advanced observability
+- 🔄 Enhanced CLI features
 
 ## API Reference
 
@@ -109,19 +118,66 @@ navis start
 - `app.listen(port, callback)` - Start HTTP server (Node.js)
 - `app.handleLambda(event)` - Handle AWS Lambda event
 
-### ServiceClient
+### ServiceClient (v2 Enhanced)
 
+```javascript
 const { ServiceClient } = require('navis.js');
 
+// Basic usage
 const client = new ServiceClient('http://api.example.com', {
-  timeout: 5000, // milliseconds
+  timeout: 5000,
 });
 
-// GET request
-const response = await client.get('/users');
+// With retry and circuit breaker (v2)
+const resilientClient = new ServiceClient('http://api.example.com', {
+  timeout: 5000,
+  maxRetries: 3,
+  retryBaseDelay: 1000,
+  circuitBreaker: {
+    failureThreshold: 5,
+    resetTimeout: 60000,
+  },
+});
 
-// POST request
-const result = await client.post('/users', { name: 'John' });
+// All HTTP methods (v2)
+await client.get('/users');
+await client.post('/users', { name: 'John' });
+await client.put('/users/1', { name: 'Jane' });      // v2
+await client.patch('/users/1', { name: 'Bob' });      // v2
+await client.delete('/users/1');                      // v2
+```
+
+### Service Configuration (v2)
+
+```javascript
+const { ServiceConfig, ServiceClient } = require('navis.js');
+
+const config = new ServiceConfig({
+  defaultOptions: {
+    timeout: 5000,
+    retry: { maxRetries: 3 },
+    circuitBreaker: { failureThreshold: 5 },
+  },
+});
+
+config.register('userService', 'http://localhost:3001');
+const userConfig = config.get('userService');
+const client = new ServiceClient(userConfig.baseUrl, userConfig);
+```
+
+### Service Discovery (v2)
+
+```javascript
+const { ServiceDiscovery, ServiceClient } = require('navis.js');
+
+const discovery = new ServiceDiscovery();
+discovery.register('api', [
+  'http://api1.example.com',
+  'http://api2.example.com',
+]);
+
+const url = discovery.getNext('api'); // Round-robin
+const client = new ServiceClient(url);
 ```
 
 ### Response Helpers
@@ -143,17 +199,23 @@ See the `examples/` directory:
 - `server.js` - Node.js HTTP server example
 - `lambda.js` - AWS Lambda handler example
 - `service-client-demo.js` - ServiceClient usage example
+- `v2-features-demo.js` - v2 features demonstration (retry, circuit breaker, etc.)
 
 ## Roadmap
 
-### v1 (Current)
+### v1 ✅
 Core functionality: routing, middleware, Lambda support, ServiceClient
 
-### v2 (Next)
-Resilience patterns: retry, circuit breaker, service discovery
+### v2 ✅ (Current)
+Resilience patterns: retry, circuit breaker, service discovery, CLI generators
 
 ### v3 (Future)
-Advanced features: async messaging, observability, advanced CLI
+Advanced features: async messaging (SQS/Kafka/NATS), observability, enhanced CLI
+
+## Documentation
+
+- [V2 Features Guide](./V2_FEATURES.md) - Complete v2 features documentation
+- [Verification Guide](./VERIFY_V2.md) - How to verify all features
 
 ## License
 
