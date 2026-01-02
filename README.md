@@ -2,6 +2,8 @@
 
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
+**Author:** Syed Iman Ali
+
 ## Philosophy
 
 Navis.js is "Express for serverless microservices — but simpler."
@@ -156,3 +158,9 @@ Advanced features: async messaging, observability, advanced CLI
 ## License
 
 MIT
+
+## Author
+
+**Syed Iman Ali**
+
+Created with ❤️ for the serverless microservices community.
