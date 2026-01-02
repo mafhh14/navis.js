@@ -16,7 +16,7 @@
     "api",
     "framework"
   ],
-  "author": "",
+  "author": "Syed Iman Ali",
   "license": "MIT",
   "engines": {
     "node": ">=14.0.0"
