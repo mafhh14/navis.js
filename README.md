@@ -2,7 +2,7 @@
 
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
-**Author:** Syed Iman Ali
+**Author:** Syed Imran Ali
 
 ## Philosophy
 
@@ -282,6 +282,6 @@ MIT
 
 ## Author
 
-**Syed Iman Ali**
+**Syed Imran Ali**
 
 Created with ❤️ for the serverless microservices community.
