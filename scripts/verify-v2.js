@@ -10,7 +10,7 @@ const {
   CircuitBreaker,
   retry: retryUtil,
   NavisApp,
-} = require('./src/index');
+} = require('../src/index');
 
 const { retry } = retryUtil;
 

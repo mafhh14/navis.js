@@ -13,7 +13,7 @@ const {
   HealthChecker,
   createHealthChecker,
   gracefulShutdown,
-} = require('./src/index');
+} = require('../src/index');
 
 let testsPassed = 0;
 let testsFailed = 0;
