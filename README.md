@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 5.2.2  
+**Version:** 5.3.0  
 **License:** MIT
 
 ## Philosophy
