@@ -57,6 +57,17 @@ const compress = require('./middleware/compression');
 const { HealthChecker, createHealthChecker } = require('./health/health-checker');
 const gracefulShutdown = require('./core/graceful-shutdown');
 
+// v5.1: Developer Experience
+const { SwaggerGenerator, swagger } = require('./docs/swagger');
+const { VersionManager, createVersionManager, headerVersioning } = require('./core/versioning');
+const { upload, saveFile } = require('./middleware/upload');
+const { TestApp, testApp } = require('./testing/test-helper');
+
+// v5.2: Real-time Features
+const WebSocketServer = require('./websocket/websocket-server');
+const { SSEServer, createSSEServer, sse } = require('./sse/server-sent-events');
+const { DatabasePool, createPool } = require('./db/db-pool');
+
 module.exports = {
   // Core
   NavisApp,
@@ -120,6 +131,25 @@ module.exports = {
   HealthChecker,
   createHealthChecker,
   gracefulShutdown,
+  
+  // v5.1: Developer Experience
+  SwaggerGenerator,
+  swagger,
+  VersionManager,
+  createVersionManager,
+  headerVersioning,
+  upload,
+  saveFile,
+  TestApp,
+  testApp,
+  
+  // v5.2: Real-time Features
+  WebSocketServer,
+  SSEServer,
+  createSSEServer,
+  sse,
+  DatabasePool,
+  createPool,
   
   // Utilities
   response: {

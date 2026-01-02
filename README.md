@@ -129,7 +129,7 @@ navis metrics
 - ✅ **Rate limiting** - In-memory rate limiting with configurable windows
 - ✅ **Enhanced error handling** - Custom error classes and error handler middleware
 
-### v5 (Current)
+### v5
 
 - ✅ **Caching layer** - In-memory cache with TTL and Redis adapter
 - ✅ **CORS support** - Cross-Origin Resource Sharing middleware
@@ -137,6 +137,19 @@ navis metrics
 - ✅ **Response compression** - Gzip and Brotli compression
 - ✅ **Health checks** - Liveness and readiness probes
 - ✅ **Graceful shutdown** - Clean shutdown handling
+
+### v5.1 (Current)
+
+- ✅ **OpenAPI/Swagger** - Auto-generate API documentation
+- ✅ **API versioning** - URL-based and header-based versioning
+- ✅ **File upload** - Multipart form data handling
+- ✅ **Testing utilities** - Test helpers for applications
+
+### v5.2 (Current)
+
+- ✅ **WebSocket support** - Real-time bidirectional communication
+- ✅ **Server-Sent Events** - One-way real-time streaming
+- ✅ **Database integration** - Connection pooling for PostgreSQL, MySQL, MongoDB
 
 ## API Reference
 
@@ -342,8 +355,14 @@ Advanced features: async messaging (SQS/Kafka/NATS), observability, enhanced CLI
 ### v4 ✅
 Production-ready: advanced routing, validation, authentication, rate limiting, error handling
 
-### v5 ✅ (Current)
+### v5 ✅
 Enterprise-grade: caching, CORS, security headers, compression, health checks, graceful shutdown
+
+### v5.1 ✅ (Current)
+Developer experience: OpenAPI/Swagger, API versioning, file upload, testing utilities
+
+### v5.2 ✅ (Current)
+Real-time features: WebSocket, Server-Sent Events, database integration
 
 ## Documentation
 
@@ -351,6 +370,8 @@ Enterprise-grade: caching, CORS, security headers, compression, health checks, g
 - [V3 Features Guide](./V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./V5_FEATURES.md) - Complete v5 features documentation
+- [V5.1 Features Guide](./V5.1_FEATURES.md) - Complete v5.1 features documentation
+- [V5.2 Features Guide](./V5.2_FEATURES.md) - Complete v5.2 features documentation
 - [Lambda Optimization Guide](./LAMBDA_OPTIMIZATION.md) - Lambda cold start optimization guide (v3.1)
 - [Verification Guide v2](./VERIFY_V2.md) - How to verify v2 features
 - [Verification Guide v3](./VERIFY_V3.md) - How to verify v3 features
