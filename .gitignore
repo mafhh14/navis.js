@@ -5,3 +5,5 @@
 dist/
 build/
 coverage/
+*.tgz
+*.tar.gz
