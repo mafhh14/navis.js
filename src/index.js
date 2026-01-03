@@ -68,6 +68,17 @@ const WebSocketServer = require('./websocket/websocket-server');
 const { SSEServer, createSSEServer, sse } = require('./sse/server-sent-events');
 const { DatabasePool, createPool } = require('./db/db-pool');
 
+// v5.4: GraphQL Support
+const { GraphQLServer, GraphQLError, createGraphQLServer, graphql } = require('./graphql/graphql-server');
+const { GraphQLSchema, createSchema, type, scalars, types } = require('./graphql/schema');
+const {
+  createResolver,
+  fieldResolver,
+  combineResolvers,
+  createAsyncResolver,
+  createBatchResolver,
+} = require('./graphql/resolver');
+
 module.exports = {
   // Core
   NavisApp,
@@ -150,6 +161,22 @@ module.exports = {
   sse,
   DatabasePool,
   createPool,
+  
+  // v5.4: GraphQL Support
+  GraphQLServer,
+  GraphQLError,
+  createGraphQLServer,
+  graphql,
+  GraphQLSchema,
+  createSchema,
+  type,
+  scalars,
+  types,
+  createResolver,
+  fieldResolver,
+  combineResolvers,
+  createAsyncResolver,
+  createBatchResolver,
   
   // Utilities
   response: {

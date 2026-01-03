@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 5.3.0  
+**Version:** 5.4.0  
 **License:** MIT
 
 ## Philosophy
@@ -173,11 +173,17 @@ navis metrics
 - ✅ **Server-Sent Events** - One-way real-time streaming
 - ✅ **Database integration** - Connection pooling for PostgreSQL, MySQL, MongoDB
 
-### v5.3 (Current)
-
+### v5.3 ✅
 - ✅ **TypeScript support** - Full type definitions for all features
 - ✅ **Type-safe API** - Complete IntelliSense and type checking
 - ✅ **TypeScript examples** - Ready-to-use TypeScript examples
+
+### v5.4 (Current)
+- ✅ **GraphQL support** - Lightweight GraphQL server implementation
+- ✅ **GraphQL queries & mutations** - Full query and mutation support
+- ✅ **GraphQL resolvers** - Flexible resolver system with utilities
+- ✅ **GraphQL schema builder** - Schema definition helpers
+- ✅ **GraphQL middleware** - Easy integration with Navis.js routes
 
 ## API Reference
 
@@ -266,6 +272,79 @@ response.success(res, { data: 'value' }, 200);
 // Error response
 response.error(res, 'Error message', 500);
 ```
+
+### GraphQL Support (v5.4)
+
+```javascript
+const {
+  NavisApp,
+  graphql,
+  createGraphQLServer,
+  createResolver,
+  createSchema,
+  combineResolvers,
+} = require('navis.js');
+
+// Basic GraphQL setup
+const resolvers = {
+  Query: {
+    users: createResolver(async (variables, context) => {
+      return [{ id: '1', name: 'Alice' }];
+    }),
+  },
+  Mutation: {
+    createUser: createResolver(async (variables, context) => {
+      const { name, email } = variables;
+      return { id: '2', name, email };
+    }),
+  },
+};
+
+app.use(graphql({
+  path: '/graphql',
+  resolvers,
+  context: (req) => ({ userId: req.headers['x-user-id'] }),
+}));
+
+// Advanced: Custom GraphQL server
+const server = createGraphQLServer({
+  resolvers,
+  context: async (req) => ({ user: await getUser(req) }),
+  formatError: (error) => ({ message: error.message, code: 'CUSTOM_ERROR' }),
+});
+
+app.use(server.handler({ path: '/graphql', enableGET: true }));
+
+// Schema builder
+const schema = createSchema();
+schema
+  .type('User', { id: 'ID!', name: 'String!', email: 'String!' })
+  .query('users', { type: '[User!]!' })
+  .mutation('createUser', { args: { name: 'String!', email: 'String!' }, type: 'User!' });
+const schemaString = schema.build();
+
+// Resolver utilities
+const userResolver = createResolver(
+  async (variables, context) => { /* resolver logic */ },
+  {
+    validate: async (vars) => ({ valid: true }),
+    authorize: async (ctx) => true,
+    cache: { get: async (k) => null, set: async (k, v) => {}, key: (v, c) => 'key' },
+  }
+);
+
+// Combine multiple resolvers
+const allResolvers = combineResolvers(userResolvers, postResolvers, commentResolvers);
+```
+
+**GraphQL Features:**
+- Query and mutation support
+- Resolver utilities (validation, authorization, caching)
+- Schema builder for type definitions
+- Context injection for request-specific data
+- Error formatting and handling
+- GET and POST request support
+- TypeScript support included
 
 ### Observability (v3)
 
@@ -356,6 +435,65 @@ exports.handler = async (event, context) => {
 };
 ```
 
+### GraphQL Support (v5.4)
+
+```javascript
+const { NavisApp, graphql, createResolver } = require('navis.js');
+
+const app = new NavisApp();
+
+// Define resolvers
+const resolvers = {
+  Query: {
+    // Get all users
+    users: createResolver(async (variables, context) => {
+      return [{ id: '1', name: 'Alice' }, { id: '2', name: 'Bob' }];
+    }),
+
+    // Get user by ID
+    user: createResolver(async (variables, context) => {
+      const { id } = variables;
+      return { id, name: 'Alice', email: 'alice@example.com' };
+    }),
+  },
+
+  Mutation: {
+    // Create user
+    createUser: createResolver(async (variables, context) => {
+      const { name, email } = variables;
+      return { id: '3', name, email };
+    }),
+  },
+};
+
+// Add GraphQL middleware
+app.use(graphql({
+  path: '/graphql',
+  resolvers,
+  context: (req) => ({
+    userId: req.headers['x-user-id'] || null,
+  }),
+}));
+
+app.listen(3000);
+```
+
+**GraphQL Query Example:**
+```bash
+curl -X POST http://localhost:3000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "query { users { id name } }"}'
+```
+
+**GraphQL Mutation Example:**
+```bash
+curl -X POST http://localhost:3000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query": "mutation { createUser(name: \"Charlie\", email: \"charlie@example.com\") { id name email } }"}'
+```
+
+See `examples/graphql-demo.js` for a complete GraphQL example.
+
 ## Examples
 
 See the `examples/` directory:
@@ -372,6 +510,7 @@ See the `examples/` directory:
 - `v5-features-demo.js` - v5 features demonstration (caching, CORS, security, compression, health checks, etc.)
 - `v5.1-features-demo.js` - v5.1 features demonstration (Swagger, versioning, upload, testing)
 - `v5.2-features-demo.js` - v5.2 features demonstration (WebSocket, SSE, database)
+- `graphql-demo.js` - GraphQL server example with queries and mutations (v5.4)
 - `service-client-demo.js` - ServiceClient usage example
 
 ## Roadmap
@@ -397,13 +536,15 @@ Developer experience: OpenAPI/Swagger, API versioning, file upload, testing util
 ### v5.2 ✅
 Real-time features: WebSocket, Server-Sent Events, database integration
 
-### v5.3 ✅ (Current)
+### v5.3 ✅
 TypeScript support: Full type definitions, type-safe API, IntelliSense
+
+### v5.4 ✅ (Current)
+GraphQL support: Lightweight GraphQL server, queries, mutations, resolvers, schema builder
 
 ## What's Next?
 
 Future versions may include:
-- GraphQL support
 - gRPC integration
 - Advanced caching strategies
 - More database adapters

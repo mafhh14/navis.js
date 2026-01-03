@@ -656,6 +656,123 @@ export const DatabasePool: {
   new (options?: DatabasePoolOptions): DatabasePool;
 };
 
+// ============================================
+// GraphQL Types (v5.4)
+// ============================================
+
+export interface GraphQLRequest {
+  query: string;
+  variables?: Record<string, any>;
+  operationName?: string;
+}
+
+export interface GraphQLResponse {
+  data?: any;
+  errors?: GraphQLError[];
+}
+
+export interface GraphQLError {
+  message: string;
+  code?: string;
+  extensions?: Record<string, any>;
+  locations?: Array<{ line: number; column: number }>;
+  path?: Array<string | number>;
+}
+
+export interface GraphQLContext {
+  req: NavisRequest;
+  headers: Record<string, string>;
+  query: Record<string, string>;
+  params: Record<string, string>;
+  [key: string]: any;
+}
+
+export type GraphQLResolver = (
+  variables: Record<string, any>,
+  context: GraphQLContext,
+  fields?: string[]
+) => Promise<any> | any;
+
+export interface GraphQLResolverOptions {
+  validate?: (variables: Record<string, any>) => Promise<{ valid: boolean; errors?: string[] }>;
+  authorize?: (context: GraphQLContext) => Promise<boolean>;
+  cache?: {
+    get: (key: string) => Promise<any>;
+    set: (key: string, value: any, ttl?: number) => Promise<void>;
+    key?: (variables: Record<string, any>, context: GraphQLContext) => string;
+    ttl?: number;
+  };
+  errorHandler?: (error: Error, variables: Record<string, any>, context: GraphQLContext) => Promise<any>;
+}
+
+export interface GraphQLServerOptions {
+  schema?: any;
+  resolvers?: {
+    Query?: Record<string, GraphQLResolver | { resolve: GraphQLResolver }>;
+    Mutation?: Record<string, GraphQLResolver | { resolve: GraphQLResolver }>;
+    [key: string]: any;
+  };
+  context?: (req: NavisRequest) => Promise<Record<string, any>> | Record<string, any>;
+  formatError?: (error: Error) => GraphQLError;
+  introspection?: boolean;
+}
+
+export interface GraphQLHandlerOptions {
+  path?: string;
+  method?: string;
+  enableGET?: boolean;
+}
+
+export interface GraphQLSchema {
+  type(name: string, definition: any): GraphQLSchema;
+  query(name: string, definition: any): GraphQLSchema;
+  mutation(name: string, definition: any): GraphQLSchema;
+  build(): string;
+}
+
+export interface GraphQLTypes {
+  input(name: string, fields: Record<string, string>): string;
+  list(type: string): string;
+  required(type: string): string;
+  requiredList(type: string): string;
+}
+
+export interface GraphQLScalars {
+  String: string;
+  Int: string;
+  Float: string;
+  Boolean: string;
+  ID: string;
+}
+
+export interface GraphQLAsyncResolverOptions {
+  maxRetries?: number;
+  retryDelay?: number;
+  retryCondition?: (error: Error) => boolean;
+}
+
+export interface GraphQLBatchResolverOptions {
+  batchKey?: (variables: Record<string, any>) => string;
+  batchSize?: number;
+  waitTime?: number;
+}
+
+export const GraphQLServer: {
+  new (options?: GraphQLServerOptions): GraphQLServer;
+};
+
+export interface GraphQLServer {
+  handler(options?: GraphQLHandlerOptions): Middleware;
+}
+
+export const GraphQLSchema: {
+  new (): GraphQLSchema;
+};
+
+export const GraphQLError: {
+  new (message: string, code?: string, extensions?: Record<string, any>): Error;
+};
+
 // Functions
 export function retry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T>;
 export function shouldRetryHttpStatus(statusCode: number): boolean;
@@ -686,6 +803,19 @@ export function gracefulShutdown(server: any, options?: GracefulShutdownOptions)
 export function getPool(): ServiceClientPool;
 export function createLazyInit(initFn: () => Promise<any>, options?: LazyInitOptions): LazyInit;
 export function coldStartTracker(): Middleware;
+export function createGraphQLServer(options?: GraphQLServerOptions): GraphQLServer;
+export function graphql(options?: GraphQLServerOptions): Middleware;
+export function createSchema(): GraphQLSchema;
+export function type(name: string, definition: any): GraphQLSchema;
+export function createResolver(resolverFn: GraphQLResolver, options?: GraphQLResolverOptions): GraphQLResolver;
+export function fieldResolver(fieldName: string, resolverFn: GraphQLResolver): Record<string, GraphQLResolver>;
+export function combineResolvers(...resolvers: any[]): any;
+export function createAsyncResolver(resolverFn: GraphQLResolver, options?: GraphQLAsyncResolverOptions): GraphQLResolver;
+export function createBatchResolver(resolverFn: GraphQLResolver, options?: GraphQLBatchResolverOptions): GraphQLResolver;
+
+// GraphQL Constants
+export const scalars: GraphQLScalars;
+export const types: GraphQLTypes;
 
 // Error Classes
 export class ValidationError extends Error {
