@@ -171,19 +171,24 @@ navis metrics
 
 - ✅ **WebSocket support** - Real-time bidirectional communication
 - ✅ **Server-Sent Events** - One-way real-time streaming
-- ✅ **Database integration** - Connection pooling for PostgreSQL, MySQL, MongoDB
+- ✅ **Database integration** - Connection pooling for PostgreSQL, MySQL, MongoDB, SQLite, SQL Server
 
 ### v5.3 ✅
 - ✅ **TypeScript support** - Full type definitions for all features
 - ✅ **Type-safe API** - Complete IntelliSense and type checking
 - ✅ **TypeScript examples** - Ready-to-use TypeScript examples
 
-### v5.4 (Current)
+### v5.4 ✅
 - ✅ **GraphQL support** - Lightweight GraphQL server implementation
 - ✅ **GraphQL queries & mutations** - Full query and mutation support
 - ✅ **GraphQL resolvers** - Flexible resolver system with utilities
 - ✅ **GraphQL schema builder** - Schema definition helpers
 - ✅ **GraphQL middleware** - Easy integration with Navis.js routes
+
+### v5.5 (Current)
+- ✅ **Extended database adapters** - SQLite and SQL Server support
+- ✅ **Enhanced database pool** - Support for 5 database types (PostgreSQL, MySQL, MongoDB, SQLite, SQL Server)
+- ✅ **Improved connection handling** - Better error handling and connection management
 
 ## API Reference
 
@@ -545,6 +550,73 @@ curl -X POST http://localhost:3000/graphql \
 
 See `examples/graphql-demo.js` for a complete GraphQL example.
 
+### Extended Database Adapters (v5.5)
+
+**JavaScript Example:**
+```javascript
+const { NavisApp, createPool, response } = require('navis.js');
+
+const app = new NavisApp();
+
+// SQLite Database
+app.get('/sqlite/users', async (req, res) => {
+  const db = createPool({
+    type: 'sqlite',
+    connectionString: ':memory:', // or path to .db file
+  });
+  
+  await db.connect();
+  const users = await db.query('SELECT * FROM users');
+  await db.close();
+  
+  response.success(res, { users });
+});
+
+// SQL Server Database
+app.get('/sqlserver/users', async (req, res) => {
+  const db = createPool({
+    type: 'mssql',
+    connectionString: 'Server=localhost;Database=testdb;User Id=sa;Password=pass',
+  });
+  
+  await db.connect();
+  const users = await db.query('SELECT TOP 10 * FROM users');
+  await db.close();
+  
+  response.success(res, { users });
+});
+```
+
+**TypeScript Example:**
+```typescript
+import { NavisApp, createPool, response, DatabasePool } from 'navis.js';
+
+const app = new NavisApp();
+
+// SQLite with TypeScript
+app.get('/sqlite/users', async (req, res) => {
+  const db: DatabasePool = createPool({
+    type: 'sqlite',
+    connectionString: ':memory:',
+  });
+  
+  await db.connect();
+  const users = await db.query('SELECT * FROM users') as User[];
+  await db.close();
+  
+  response.success(res, { users });
+});
+```
+
+**Supported Databases:**
+- ✅ PostgreSQL (`postgres` or `postgresql`)
+- ✅ MySQL/MariaDB (`mysql` or `mariadb`)
+- ✅ MongoDB (`mongodb`)
+- ✅ SQLite (`sqlite` or `sqlite3`) - **NEW in v5.5**
+- ✅ SQL Server (`mssql` or `sqlserver`) - **NEW in v5.5**
+
+See `examples/database-adapters-demo.js` and `examples/database-adapters-demo.ts` for complete examples.
+
 ## Examples
 
 See the `examples/` directory:
@@ -563,6 +635,8 @@ See the `examples/` directory:
 - `v5.2-features-demo.js` - v5.2 features demonstration (WebSocket, SSE, database)
 - `graphql-demo.js` - GraphQL server example with queries and mutations (v5.4) - JavaScript
 - `graphql-demo.ts` - GraphQL server example with TypeScript types (v5.4) - TypeScript
+- `database-adapters-demo.js` - Extended database adapters example (v5.5) - JavaScript
+- `database-adapters-demo.ts` - Extended database adapters example (v5.5) - TypeScript
 - `service-client-demo.js` - ServiceClient usage example
 
 ## Roadmap
@@ -591,15 +665,18 @@ Real-time features: WebSocket, Server-Sent Events, database integration
 ### v5.3 ✅
 TypeScript support: Full type definitions, type-safe API, IntelliSense
 
-### v5.4 ✅ (Current)
+### v5.4 ✅
 GraphQL support: Lightweight GraphQL server, queries, mutations, resolvers, schema builder
+
+### v5.5 ✅ (Current)
+Extended database adapters: SQLite and SQL Server support, enhanced connection pooling
 
 ## What's Next?
 
 Future versions may include:
 - gRPC integration
 - Advanced caching strategies
-- More database adapters
+- Advanced query builders
 - Enhanced monitoring and alerting
 
 ## Documentation

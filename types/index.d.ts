@@ -537,7 +537,7 @@ export interface SSEServer {
 }
 
 export interface DatabasePoolOptions {
-  type?: 'postgres' | 'postgresql' | 'mysql' | 'mariadb' | 'mongodb';
+  type?: 'postgres' | 'postgresql' | 'mysql' | 'mariadb' | 'mongodb' | 'sqlite' | 'sqlite3' | 'mssql' | 'sqlserver';
   connectionString?: string;
   maxConnections?: number;
   minConnections?: number;
