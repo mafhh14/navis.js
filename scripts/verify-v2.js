@@ -288,7 +288,7 @@ test('CLI Generator - Generator file exists', () => {
   const fs = require('fs');
   const path = require('path');
   
-  const generatorPath = path.join(__dirname, 'bin', 'generators', 'service.js');
+  const generatorPath = path.join(__dirname, '..', 'bin', 'generators', 'service.js');
   if (!fs.existsSync(generatorPath)) {
     throw new Error('Service generator file not found');
   }
