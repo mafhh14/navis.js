@@ -437,6 +437,7 @@ exports.handler = async (event, context) => {
 
 ### GraphQL Support (v5.4)
 
+**JavaScript Example:**
 ```javascript
 const { NavisApp, graphql, createResolver } = require('navis.js');
 
@@ -478,6 +479,56 @@ app.use(graphql({
 app.listen(3000);
 ```
 
+**TypeScript Example:**
+```typescript
+import {
+  NavisApp,
+  graphql,
+  createResolver,
+  GraphQLContext,
+} from 'navis.js';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+const app = new NavisApp();
+
+// Define resolvers with TypeScript types
+const resolvers = {
+  Query: {
+    users: createResolver<User[]>(async (variables, context: GraphQLContext) => {
+      return [{ id: '1', name: 'Alice', email: 'alice@example.com' }];
+    }),
+
+    user: createResolver<User | null>(async (variables, context: GraphQLContext) => {
+      const { id } = variables as { id: string };
+      return { id, name: 'Alice', email: 'alice@example.com' };
+    }),
+  },
+
+  Mutation: {
+    createUser: createResolver<User>(async (variables, context: GraphQLContext) => {
+      const { name, email } = variables as { name: string; email: string };
+      return { id: '3', name, email };
+    }),
+  },
+};
+
+// Add GraphQL middleware
+app.use(graphql({
+  path: '/graphql',
+  resolvers,
+  context: (req) => ({
+    userId: (req.headers['x-user-id'] as string) || null,
+  }),
+}));
+
+app.listen(3000);
+```
+
 **GraphQL Query Example:**
 ```bash
 curl -X POST http://localhost:3000/graphql \
@@ -510,7 +561,8 @@ See the `examples/` directory:
 - `v5-features-demo.js` - v5 features demonstration (caching, CORS, security, compression, health checks, etc.)
 - `v5.1-features-demo.js` - v5.1 features demonstration (Swagger, versioning, upload, testing)
 - `v5.2-features-demo.js` - v5.2 features demonstration (WebSocket, SSE, database)
-- `graphql-demo.js` - GraphQL server example with queries and mutations (v5.4)
+- `graphql-demo.js` - GraphQL server example with queries and mutations (v5.4) - JavaScript
+- `graphql-demo.ts` - GraphQL server example with TypeScript types (v5.4) - TypeScript
 - `service-client-demo.js` - ServiceClient usage example
 
 ## Roadmap

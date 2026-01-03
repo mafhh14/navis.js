@@ -807,7 +807,7 @@ export function createGraphQLServer(options?: GraphQLServerOptions): GraphQLServ
 export function graphql(options?: GraphQLServerOptions): Middleware;
 export function createSchema(): GraphQLSchema;
 export function type(name: string, definition: any): GraphQLSchema;
-export function createResolver(resolverFn: GraphQLResolver, options?: GraphQLResolverOptions): GraphQLResolver;
+export function createResolver<T = any>(resolverFn: GraphQLResolver, options?: GraphQLResolverOptions): GraphQLResolver;
 export function fieldResolver(fieldName: string, resolverFn: GraphQLResolver): Record<string, GraphQLResolver>;
 export function combineResolvers(...resolvers: any[]): any;
 export function createAsyncResolver(resolverFn: GraphQLResolver, options?: GraphQLAsyncResolverOptions): GraphQLResolver;
