@@ -211,7 +211,7 @@ navis metrics
 - 🐛 **Bug fix** - Fixed ServiceClient JSON parsing error handling - now properly rejects on parse failures instead of silently resolving
 - ✅ **Improved error handling** - ServiceClient now provides detailed error information (status code, headers, raw body) when JSON parsing fails
 
-### v5.8.0 ✅ (Current)
+### v5.8.0 ✅
 - ✅ **Advanced caching strategies** - Multi-level caching (L1 in-memory + L2 Redis)
 - ✅ **Cache warming** - Pre-populate cache with frequently accessed data
 - ✅ **Cache invalidation** - Tag-based and pattern-based invalidation
@@ -220,6 +220,9 @@ navis metrics
 - ✅ **Write strategies** - Write-through, write-back, write-around
 - ✅ **Cache stampede prevention** - Prevents concurrent requests for same key
 - ✅ **Cache versioning** - Support for cache schema migrations
+
+### v5.8.1 ✅ (Current)
+- 📝 **Documentation** - Enhanced README Philosophy section with comprehensive feature highlights
 
 ## API Reference
 
@@ -847,15 +850,30 @@ TypeScript support: Full type definitions, type-safe API, IntelliSense
 GraphQL support: Lightweight GraphQL server, queries, mutations, resolvers, schema builder
 
 ### v5.5 ✅
-
-### v5.6 (Current)
 Extended database adapters: SQLite and SQL Server support, enhanced connection pooling
+
+### v5.6 ✅
+Advanced query builders: Fluent SQL and MongoDB query builders with TypeScript support
+
+### v5.7 ✅
+ORM-like features: Model definitions with relationships, hooks, validation, and database migrations
+
+### v5.7.1 ✅
+Bug fixes: ServiceClient JSON parsing error handling improvements
+
+### v5.8 ✅
+Advanced caching strategies: Multi-level caching, cache warming, invalidation, statistics, compression
+
+### v5.8.1 ✅ (Current)
+Documentation: Enhanced README Philosophy section with comprehensive feature highlights
 
 ## What's Next?
 
 Future versions may include:
 - gRPC integration
 - Enhanced monitoring and alerting
+- Additional database adapters
+- Performance optimizations
 
 ## Documentation
 
