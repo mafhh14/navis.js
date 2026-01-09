@@ -14,8 +14,10 @@ Navis.js is "Express for serverless microservices — but simpler."
 - **Serverless-first** - Built for AWS Lambda with cold start optimizations
 - **Microservice-friendly** - API-to-API communication made easy
 - **Simple & readable** - No magic abstractions
-- **Production-ready** - Enterprise features included (caching, security, observability)
-- **Developer-friendly** - OpenAPI docs, testing utilities, and comprehensive tooling
+- **Production-ready** - Enterprise features included (advanced caching, security, observability, databases, GraphQL)
+- **Developer-friendly** - Full TypeScript support, OpenAPI docs, testing utilities, and comprehensive tooling
+- **Database-agnostic** - Support for PostgreSQL, MySQL, MongoDB, SQLite, SQL Server with ORM-like features
+- **Real-time ready** - WebSocket and Server-Sent Events support
 
 ## Installation
 
