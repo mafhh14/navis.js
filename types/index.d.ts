@@ -550,6 +550,76 @@ export interface DatabasePool {
   getConnection(): Promise<any>;
   close(): Promise<void>;
   ping(): Promise<boolean>;
+  type: string;
+  db?: any;
+}
+
+// Query Builder Types (v5.6)
+export interface QueryBuilder {
+  select(fields?: string | string[]): QueryBuilder;
+  from(table: string): QueryBuilder;
+  where(field: string | object | ((qb: QueryBuilder) => void), operator?: string, value?: any): QueryBuilder;
+  orWhere(field: string | object | ((qb: QueryBuilder) => void), operator?: string, value?: any): QueryBuilder;
+  whereIn(field: string, values: any[]): QueryBuilder;
+  whereNotIn(field: string, values: any[]): QueryBuilder;
+  whereNull(field: string): QueryBuilder;
+  whereNotNull(field: string): QueryBuilder;
+  join(table: string, first: string, operator?: string, second?: string, type?: string): QueryBuilder;
+  leftJoin(table: string, first: string, operator?: string, second?: string): QueryBuilder;
+  rightJoin(table: string, first: string, operator?: string, second?: string): QueryBuilder;
+  fullJoin(table: string, first: string, operator?: string, second?: string): QueryBuilder;
+  groupBy(fields: string | string[]): QueryBuilder;
+  having(field: string, operator: string, value: any): QueryBuilder;
+  orderBy(field: string | string[] | Record<string, string>, direction?: string): QueryBuilder;
+  orderByDesc(field: string): QueryBuilder;
+  limit(limit: number): QueryBuilder;
+  offset(offset: number): QueryBuilder;
+  insert(table: string, data?: Record<string, any>): QueryBuilder;
+  update(table: string, data?: Record<string, any>): QueryBuilder;
+  delete(table?: string): QueryBuilder;
+  execute(): Promise<any>;
+  toSQL(): { sql: string; params: any[] };
+}
+
+export interface MongoDBQueryBuilder {
+  collection(collection: string): MongoDBQueryBuilder;
+  where(field: string | Record<string, any>, value?: any): MongoDBQueryBuilder;
+  equals(field: string, value: any): MongoDBQueryBuilder;
+  notEquals(field: string, value: any): MongoDBQueryBuilder;
+  gt(field: string, value: any): MongoDBQueryBuilder;
+  gte(field: string, value: any): MongoDBQueryBuilder;
+  lt(field: string, value: any): MongoDBQueryBuilder;
+  lte(field: string, value: any): MongoDBQueryBuilder;
+  in(field: string, values: any[]): MongoDBQueryBuilder;
+  notIn(field: string, values: any[]): MongoDBQueryBuilder;
+  contains(field: string, value: string, caseSensitive?: boolean): MongoDBQueryBuilder;
+  exists(field: string, exists?: boolean): MongoDBQueryBuilder;
+  whereNull(field: string): MongoDBQueryBuilder;
+  whereNotNull(field: string): MongoDBQueryBuilder;
+  and(conditions: Record<string, any>): MongoDBQueryBuilder;
+  or(conditions: Record<string, any>[]): MongoDBQueryBuilder;
+  select(fields: string | string[] | Record<string, number>): MongoDBQueryBuilder;
+  exclude(fields: string | string[]): MongoDBQueryBuilder;
+  sort(field: string | Record<string, number>, direction?: number): MongoDBQueryBuilder;
+  sortAsc(field: string): MongoDBQueryBuilder;
+  sortDesc(field: string): MongoDBQueryBuilder;
+  limit(limit: number): MongoDBQueryBuilder;
+  skip(skip: number): MongoDBQueryBuilder;
+  find(): Promise<any[]>;
+  findOne(): Promise<any | null>;
+  count(): Promise<number>;
+  insert(data: Record<string, any> | Record<string, any>[]): MongoDBQueryBuilder;
+  update(data: Record<string, any>, options?: Record<string, any>): MongoDBQueryBuilder;
+  delete(options?: Record<string, any>): MongoDBQueryBuilder;
+  execute(): Promise<any>;
+  aggregate(): MongoDBQueryBuilder;
+  match(filter: Record<string, any>): MongoDBQueryBuilder;
+  group(group: Record<string, any>): MongoDBQueryBuilder;
+  project(projection: Record<string, any>): MongoDBQueryBuilder;
+  sortStage(sort: Record<string, number>): MongoDBQueryBuilder;
+  limitStage(limit: number): MongoDBQueryBuilder;
+  skipStage(skip: number): MongoDBQueryBuilder;
+  aggregateExecute(): Promise<any[]>;
 }
 
 // ============================================
@@ -798,6 +868,8 @@ export function testApp(app: NavisApp): TestApp;
 export function sse(): Middleware;
 export function createSSEServer(): SSEServer;
 export function createPool(options?: DatabasePoolOptions): DatabasePool;
+export function queryBuilder(dbPool: DatabasePool, table?: string): QueryBuilder;
+export function mongoQueryBuilder(dbPool: DatabasePool, collection?: string): MongoDBQueryBuilder;
 export function createHealthChecker(options?: HealthCheckOptions): HealthChecker;
 export function gracefulShutdown(server: any, options?: GracefulShutdownOptions): any;
 export function getPool(): ServiceClientPool;

@@ -351,8 +351,32 @@ function createPool(options = {}) {
   return new DatabasePool(options);
 }
 
+/**
+ * Get query builder for SQL databases
+ * @param {DatabasePool} dbPool - Database pool instance
+ * @param {string} table - Optional table name
+ * @returns {QueryBuilder} - Query builder instance
+ */
+function queryBuilder(dbPool, table = null) {
+  const { createQueryBuilder } = require('./query-builder');
+  return createQueryBuilder(dbPool, table);
+}
+
+/**
+ * Get MongoDB query builder
+ * @param {DatabasePool} dbPool - Database pool instance
+ * @param {string} collection - Optional collection name
+ * @returns {MongoDBQueryBuilder} - MongoDB query builder instance
+ */
+function mongoQueryBuilder(dbPool, collection = null) {
+  const { createMongoDBQueryBuilder } = require('./mongodb-query-builder');
+  return createMongoDBQueryBuilder(dbPool, collection);
+}
+
 module.exports = {
   DatabasePool,
   createPool,
+  queryBuilder,
+  mongoQueryBuilder,
 };
 

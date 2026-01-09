@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 5.4.0  
+**Version:** 5.6.0  
 **License:** MIT
 
 ## Philosophy
@@ -185,10 +185,17 @@ navis metrics
 - ✅ **GraphQL schema builder** - Schema definition helpers
 - ✅ **GraphQL middleware** - Easy integration with Navis.js routes
 
-### v5.5 (Current)
+### v5.5 ✅
 - ✅ **Extended database adapters** - SQLite and SQL Server support
 - ✅ **Enhanced database pool** - Support for 5 database types (PostgreSQL, MySQL, MongoDB, SQLite, SQL Server)
 - ✅ **Improved connection handling** - Better error handling and connection management
+
+### v5.6 (Current)
+- ✅ **Advanced query builders** - Fluent SQL query builder for all SQL databases
+- ✅ **MongoDB query builder** - Fluent MongoDB query builder with aggregation support
+- ✅ **Type-safe queries** - Full TypeScript support for query builders
+- ✅ **Complex queries** - Support for JOINs, nested WHERE conditions, GROUP BY, HAVING, ORDER BY
+- ✅ **Database-agnostic** - Automatic SQL dialect handling (PostgreSQL, MySQL, SQLite, SQL Server)
 
 ## API Reference
 
@@ -617,6 +624,147 @@ app.get('/sqlite/users', async (req, res) => {
 
 See `examples/database-adapters-demo.js` and `examples/database-adapters-demo.ts` for complete examples.
 
+### Advanced Query Builders (v5.6)
+
+**JavaScript Example:**
+```javascript
+const { NavisApp, createPool, queryBuilder, mongoQueryBuilder, response } = require('navis.js');
+
+const app = new NavisApp();
+
+// SQL Query Builder
+app.get('/users', async (req, res) => {
+  const db = createPool({
+    type: 'postgres',
+    connectionString: process.env.DATABASE_URL,
+  });
+  
+  await db.connect();
+  
+  // Fluent query builder
+  const users = await queryBuilder(db, 'users')
+    .select(['id', 'name', 'email'])
+    .where('status', '=', 'active')
+    .where('age', '>', 18)
+    .whereIn('role', ['user', 'admin'])
+    .orderBy('name', 'ASC')
+    .limit(10)
+    .execute();
+  
+  await db.close();
+  response.success(res, { users });
+});
+
+// Complex WHERE with nested conditions
+app.get('/products', async (req, res) => {
+  const db = createPool({ type: 'sqlite', connectionString: ':memory:' });
+  await db.connect();
+  
+  const products = await queryBuilder(db, 'products')
+    .select('*')
+    .where((qb) => {
+      qb.where('category', '=', 'Electronics')
+        .orWhere('price', '<', 50);
+    })
+    .where('in_stock', '>', 0)
+    .groupBy('category')
+    .having('COUNT(*)', '>', 5)
+    .orderBy('price', 'DESC')
+    .execute();
+  
+  await db.close();
+  response.success(res, { products });
+});
+
+// INSERT, UPDATE, DELETE
+app.post('/users', async (req, res) => {
+  const db = createPool({ type: 'postgres', connectionString: process.env.DATABASE_URL });
+  await db.connect();
+  
+  const result = await queryBuilder(db)
+    .insert('users', {
+      name: req.body.name,
+      email: req.body.email,
+      age: req.body.age,
+    })
+    .execute();
+  
+  await db.close();
+  response.success(res, { id: result.insertId });
+});
+
+// MongoDB Query Builder
+app.get('/mongo/users', async (req, res) => {
+  const db = createPool({
+    type: 'mongodb',
+    connectionString: process.env.MONGODB_URI,
+  });
+  
+  await db.connect();
+  
+  const users = await mongoQueryBuilder(db, 'users')
+    .where('status', 'active')
+    .gt('age', 18)
+    .in('role', ['user', 'admin'])
+    .sortDesc('created_at')
+    .limit(10)
+    .find();
+  
+  await db.close();
+  response.success(res, { users });
+});
+```
+
+**TypeScript Example:**
+```typescript
+import { NavisApp, createPool, queryBuilder, mongoQueryBuilder, response, DatabasePool, QueryBuilder } from 'navis.js';
+
+const app = new NavisApp();
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+}
+
+app.get('/users', async (req, res) => {
+  const db: DatabasePool = createPool({
+    type: 'postgres',
+    connectionString: process.env.DATABASE_URL!,
+  });
+  
+  await db.connect();
+  
+  const users = await queryBuilder(db, 'users')
+    .select(['id', 'name', 'email'])
+    .where('status', '=', 'active')
+    .where((qb: QueryBuilder) => {
+      qb.where('age', '>', 18)
+        .orWhere('role', '=', 'admin');
+    })
+    .orderBy('name', 'ASC')
+    .limit(10)
+    .execute() as User[];
+  
+  await db.close();
+  response.success(res, { users });
+});
+```
+
+**Query Builder Features:**
+- ✅ **SELECT** - Fluent SELECT queries with WHERE, JOIN, GROUP BY, HAVING, ORDER BY, LIMIT, OFFSET
+- ✅ **INSERT** - Type-safe INSERT operations
+- ✅ **UPDATE** - UPDATE with WHERE conditions
+- ✅ **DELETE** - DELETE with WHERE conditions
+- ✅ **JOINs** - LEFT, RIGHT, INNER, FULL JOIN support
+- ✅ **Nested conditions** - Complex WHERE with callbacks
+- ✅ **Database-specific** - Automatic SQL dialect handling
+- ✅ **MongoDB** - Full MongoDB query builder with aggregation pipeline
+- ✅ **TypeScript** - Full type definitions and IntelliSense support
+
+See `examples/query-builder-demo.js` and `examples/query-builder-demo.ts` for complete examples.
+
 ## Examples
 
 See the `examples/` directory:
@@ -637,6 +785,8 @@ See the `examples/` directory:
 - `graphql-demo.ts` - GraphQL server example with TypeScript types (v5.4) - TypeScript
 - `database-adapters-demo.js` - Extended database adapters example (v5.5) - JavaScript
 - `database-adapters-demo.ts` - Extended database adapters example (v5.5) - TypeScript
+- `query-builder-demo.js` - Advanced query builder example (v5.6) - JavaScript
+- `query-builder-demo.ts` - Advanced query builder example (v5.6) - TypeScript
 - `service-client-demo.js` - ServiceClient usage example
 
 ## Roadmap
@@ -668,7 +818,9 @@ TypeScript support: Full type definitions, type-safe API, IntelliSense
 ### v5.4 ✅
 GraphQL support: Lightweight GraphQL server, queries, mutations, resolvers, schema builder
 
-### v5.5 ✅ (Current)
+### v5.5 ✅
+
+### v5.6 (Current)
 Extended database adapters: SQLite and SQL Server support, enhanced connection pooling
 
 ## What's Next?
@@ -676,8 +828,9 @@ Extended database adapters: SQLite and SQL Server support, enhanced connection p
 Future versions may include:
 - gRPC integration
 - Advanced caching strategies
-- Advanced query builders
 - Enhanced monitoring and alerting
+- Database migrations
+- ORM-like features
 
 ## Documentation
 
