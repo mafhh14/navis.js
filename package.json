@@ -1,6 +1,6 @@
 {
   "name": "navis.js",
-  "version": "5.8.1",
+  "version": "5.8.2",
   "description": "A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js",
   "main": "src/index.js",
   "types": "types/index.d.ts",
