@@ -870,6 +870,202 @@ export function createSSEServer(): SSEServer;
 export function createPool(options?: DatabasePoolOptions): DatabasePool;
 export function queryBuilder(dbPool: DatabasePool, table?: string): QueryBuilder;
 export function mongoQueryBuilder(dbPool: DatabasePool, collection?: string): MongoDBQueryBuilder;
+
+// ORM-like Model Types (v5.7)
+export interface ModelFindOptions {
+  select?: string | string[];
+  orderBy?: string | Record<string, string>;
+  orderDirection?: 'ASC' | 'DESC';
+  limit?: number;
+  offset?: number;
+  sort?: string | Record<string, number>;
+  skip?: number;
+}
+
+export abstract class Model {
+  protected _data: Record<string, any>;
+  protected _original: Record<string, any>;
+  protected _changed: Record<string, any>;
+  protected _isNew: boolean;
+
+  constructor(data?: Record<string, any>);
+  
+  static tableName: string;
+  static primaryKey: string;
+  static setDatabase(dbPool: DatabasePool): void;
+  static getDatabase(): DatabasePool | null;
+  
+  static find(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void), options?: ModelFindOptions): Promise<Model[]>;
+  static findOne(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void), options?: ModelFindOptions): Promise<Model | null>;
+  static findById(id: any): Promise<Model | null>;
+  static count(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void)): Promise<number>;
+  static create(data: Record<string, any>): Promise<Model>;
+  
+  static hasMany(name: string, ModelClass: typeof Model, foreignKey: string, localKey?: string): void;
+  static belongsTo(name: string, ModelClass: typeof Model, foreignKey: string): void;
+  static hasOne(name: string, ModelClass: typeof Model, foreignKey: string, localKey?: string): void;
+
+  save(): Promise<boolean>;
+  delete(): Promise<boolean>;
+  reload(): Promise<Model>;
+  toJSON(): Record<string, any>;
+  isDirty(): boolean;
+  getChanged(): Record<string, any>;
+
+  beforeSave?(): Promise<void>;
+  afterSave?(): Promise<void>;
+  beforeCreate?(): Promise<void>;
+  afterCreate?(): Promise<void>;
+  beforeUpdate?(): Promise<void>;
+  afterUpdate?(): Promise<void>;
+  beforeDelete?(): Promise<void>;
+  afterDelete?(): Promise<void>;
+  validate?(): Promise<boolean>;
+}
+
+// Migration Types (v5.7)
+export interface MigrationResult {
+  message: string;
+  executed?: string[];
+  rolledBack?: string[];
+}
+
+export interface MigrationStatus {
+  executed: number;
+  pending: number;
+  files: Array<{
+    name: string;
+    executed: boolean;
+  }>;
+}
+
+export interface MigrationModule {
+  up(dbPool: DatabasePool): Promise<void>;
+  down(dbPool: DatabasePool): Promise<void>;
+}
+
+export class MigrationRunner {
+  constructor(dbPool: DatabasePool, migrationsPath?: string);
+  init(): Promise<void>;
+  up(limit?: number): Promise<MigrationResult>;
+  down(steps?: number): Promise<MigrationResult>;
+  status(): Promise<MigrationStatus>;
+  getMigrationFiles(): Array<{ name: string; file: string; path: string; timestamp: number }>;
+  getExecutedMigrations(): Promise<string[]>;
+  getCurrentBatch(): Promise<number>;
+}
+
+export const Model: {
+  new (data?: Record<string, any>): Model;
+  tableName: string;
+  primaryKey: string;
+  setDatabase(dbPool: DatabasePool): void;
+  getDatabase(): DatabasePool | null;
+  find(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void), options?: ModelFindOptions): Promise<Model[]>;
+  findOne(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void), options?: ModelFindOptions): Promise<Model | null>;
+  findById(id: any): Promise<Model | null>;
+  count(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void)): Promise<number>;
+  create(data: Record<string, any>): Promise<Model>;
+  hasMany(name: string, ModelClass: typeof Model, foreignKey: string, localKey?: string): void;
+  belongsTo(name: string, ModelClass: typeof Model, foreignKey: string): void;
+  hasOne(name: string, ModelClass: typeof Model, foreignKey: string, localKey?: string): void;
+};
+
+export const Migration: {
+  new (dbPool: DatabasePool, migrationsPath?: string): MigrationRunner;
+};
+
+export function createMigration(dbPool: DatabasePool, migrationsPath?: string): MigrationRunner;
+
+// ORM-like Model Types (v5.7)
+export interface ModelOptions {
+  [key: string]: any;
+}
+
+export interface ModelFindOptions {
+  select?: string | string[];
+  orderBy?: string | Record<string, string>;
+  orderDirection?: 'ASC' | 'DESC';
+  limit?: number;
+  offset?: number;
+  sort?: string | Record<string, number>;
+  skip?: number;
+}
+
+export abstract class Model {
+  protected _data: Record<string, any>;
+  protected _original: Record<string, any>;
+  protected _changed: Record<string, any>;
+  protected _isNew: boolean;
+
+  constructor(data?: Record<string, any>);
+  
+  static tableName: string;
+  static primaryKey: string;
+  static setDatabase(dbPool: DatabasePool): void;
+  static getDatabase(): DatabasePool | null;
+  
+  static find(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void), options?: ModelFindOptions): Promise<Model[]>;
+  static findOne(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void), options?: ModelFindOptions): Promise<Model | null>;
+  static findById(id: any): Promise<Model | null>;
+  static count(conditions?: Record<string, any> | ((qb: QueryBuilder | MongoDBQueryBuilder) => void)): Promise<number>;
+  static create(data: Record<string, any>): Promise<Model>;
+  
+  static hasMany(name: string, ModelClass: typeof Model, foreignKey: string, localKey?: string): void;
+  static belongsTo(name: string, ModelClass: typeof Model, foreignKey: string): void;
+  static hasOne(name: string, ModelClass: typeof Model, foreignKey: string, localKey?: string): void;
+
+  save(): Promise<boolean>;
+  delete(): Promise<boolean>;
+  reload(): Promise<Model>;
+  toJSON(): Record<string, any>;
+  isDirty(): boolean;
+  getChanged(): Record<string, any>;
+
+  beforeSave?(): Promise<void>;
+  afterSave?(): Promise<void>;
+  beforeCreate?(): Promise<void>;
+  afterCreate?(): Promise<void>;
+  beforeUpdate?(): Promise<void>;
+  afterUpdate?(): Promise<void>;
+  beforeDelete?(): Promise<void>;
+  afterDelete?(): Promise<void>;
+  validate?(): Promise<boolean>;
+}
+
+// Migration Types (v5.7)
+export interface MigrationResult {
+  message: string;
+  executed?: string[];
+  rolledBack?: string[];
+}
+
+export interface MigrationStatus {
+  executed: number;
+  pending: number;
+  files: Array<{
+    name: string;
+    executed: boolean;
+  }>;
+}
+
+export interface Migration {
+  up(dbPool: DatabasePool): Promise<void>;
+  down(dbPool: DatabasePool): Promise<void>;
+}
+
+export class MigrationRunner {
+  constructor(dbPool: DatabasePool, migrationsPath?: string);
+  init(): Promise<void>;
+  up(limit?: number): Promise<MigrationResult>;
+  down(steps?: number): Promise<MigrationResult>;
+  status(): Promise<MigrationStatus>;
+  getMigrationFiles(): Array<{ name: string; file: string; path: string; timestamp: number }>;
+  getExecutedMigrations(): Promise<string[]>;
+  getCurrentBatch(): Promise<number>;
+}
+
+export function createMigration(dbPool: DatabasePool, migrationsPath?: string): MigrationRunner;
 export function createHealthChecker(options?: HealthCheckOptions): HealthChecker;
 export function gracefulShutdown(server: any, options?: GracefulShutdownOptions): any;
 export function getPool(): ServiceClientPool;

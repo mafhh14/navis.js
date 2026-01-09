@@ -67,6 +67,8 @@ const { TestApp, testApp } = require('./testing/test-helper');
 const WebSocketServer = require('./websocket/websocket-server');
 const { SSEServer, createSSEServer, sse } = require('./sse/server-sent-events');
 const { DatabasePool, createPool, queryBuilder, mongoQueryBuilder } = require('./db/db-pool');
+const { Model } = require('./db/model');
+const { Migration, createMigration } = require('./db/migration');
 
 // v5.4: GraphQL Support
 const { GraphQLServer, GraphQLError, createGraphQLServer, graphql } = require('./graphql/graphql-server');
@@ -163,6 +165,9 @@ module.exports = {
   createPool,
   queryBuilder,
   mongoQueryBuilder,
+  Model,
+  Migration,
+  createMigration,
   
   // v5.4: GraphQL Support
   GraphQLServer,

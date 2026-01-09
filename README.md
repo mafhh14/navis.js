@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 5.6.0  
+**Version:** 5.7.0  
 **License:** MIT
 
 ## Philosophy
@@ -190,12 +190,20 @@ navis metrics
 - ✅ **Enhanced database pool** - Support for 5 database types (PostgreSQL, MySQL, MongoDB, SQLite, SQL Server)
 - ✅ **Improved connection handling** - Better error handling and connection management
 
-### v5.6 (Current)
+### v5.6 ✅
 - ✅ **Advanced query builders** - Fluent SQL query builder for all SQL databases
 - ✅ **MongoDB query builder** - Fluent MongoDB query builder with aggregation support
 - ✅ **Type-safe queries** - Full TypeScript support for query builders
 - ✅ **Complex queries** - Support for JOINs, nested WHERE conditions, GROUP BY, HAVING, ORDER BY
 - ✅ **Database-agnostic** - Automatic SQL dialect handling (PostgreSQL, MySQL, SQLite, SQL Server)
+
+### v5.7 (Current)
+- ✅ **ORM-like features** - Model definitions with relationships, hooks, and validation
+- ✅ **Database migrations** - Migration system with up/down support and tracking
+- ✅ **Model relationships** - hasMany, belongsTo, hasOne relationship definitions
+- ✅ **Lifecycle hooks** - beforeSave, afterSave, beforeCreate, afterCreate, etc.
+- ✅ **Change tracking** - isDirty, getChanged for detecting model modifications
+- ✅ **TypeScript support** - Full type definitions for models and migrations
 
 ## API Reference
 
@@ -836,6 +844,8 @@ Future versions may include:
 
 - [V2 Features Guide](./docs/V2_FEATURES.md) - Complete v2 features documentation
 - [V5.6 Features Guide](./docs/V5.6_FEATURES.md) - Advanced query builders documentation
+- [V5.7 Features Guide](./docs/V5.7_FEATURES.md) - ORM-like features and migrations documentation
+- [V5.7 Features Guide](./docs/V5.7_FEATURES.md) - ORM-like features and migrations documentation
 - [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation
