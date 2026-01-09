@@ -50,6 +50,7 @@ const {
 // v5: Enterprise Features
 const Cache = require('./cache/cache');
 const RedisCache = require('./cache/redis-cache');
+const AdvancedCache = require('./cache/advanced-cache');
 const cache = require('./middleware/cache-middleware');
 const cors = require('./middleware/cors');
 const security = require('./middleware/security');
@@ -137,6 +138,7 @@ module.exports = {
   // v5: Enterprise Features
   Cache,
   RedisCache,
+  AdvancedCache,
   cache,
   cors,
   security,

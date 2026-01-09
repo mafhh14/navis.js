@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 5.7.0  
+**Version:** 5.8.0  
 **License:** MIT
 
 ## Philosophy
@@ -197,13 +197,27 @@ navis metrics
 - ✅ **Complex queries** - Support for JOINs, nested WHERE conditions, GROUP BY, HAVING, ORDER BY
 - ✅ **Database-agnostic** - Automatic SQL dialect handling (PostgreSQL, MySQL, SQLite, SQL Server)
 
-### v5.7 ✅ (Current)
+### v5.7 ✅
 - ✅ **ORM-like features** - Model definitions with relationships, hooks, and validation
 - ✅ **Database migrations** - Migration system with up/down support and tracking
 - ✅ **Model relationships** - hasMany, belongsTo, hasOne relationship definitions
 - ✅ **Lifecycle hooks** - beforeSave, afterSave, beforeCreate, afterCreate, etc.
 - ✅ **Change tracking** - isDirty, getChanged for detecting model modifications
 - ✅ **TypeScript support** - Full type definitions for models and migrations
+
+### v5.7.1 ✅
+- 🐛 **Bug fix** - Fixed ServiceClient JSON parsing error handling - now properly rejects on parse failures instead of silently resolving
+- ✅ **Improved error handling** - ServiceClient now provides detailed error information (status code, headers, raw body) when JSON parsing fails
+
+### v5.8.0 ✅ (Current)
+- ✅ **Advanced caching strategies** - Multi-level caching (L1 in-memory + L2 Redis)
+- ✅ **Cache warming** - Pre-populate cache with frequently accessed data
+- ✅ **Cache invalidation** - Tag-based and pattern-based invalidation
+- ✅ **Cache statistics** - Comprehensive hit/miss rates, L1/L2 distribution
+- ✅ **Cache compression** - Automatic compression for large values
+- ✅ **Write strategies** - Write-through, write-back, write-around
+- ✅ **Cache stampede prevention** - Prevents concurrent requests for same key
+- ✅ **Cache versioning** - Support for cache schema migrations
 
 ## API Reference
 
@@ -795,6 +809,10 @@ See the `examples/` directory:
 - `database-adapters-demo.ts` - Extended database adapters example (v5.5) - TypeScript
 - `query-builder-demo.js` - Advanced query builder example (v5.6) - JavaScript
 - `query-builder-demo.ts` - Advanced query builder example (v5.6) - TypeScript
+- `orm-migrations-demo.js` - ORM-like features and migrations example (v5.7) - JavaScript
+- `orm-migrations-demo.ts` - ORM-like features and migrations example (v5.7) - TypeScript
+- `advanced-cache-demo.js` - Advanced caching strategies example (v5.8) - JavaScript
+- `advanced-cache-demo.ts` - Advanced caching strategies example (v5.8) - TypeScript
 - `service-client-demo.js` - ServiceClient usage example
 
 ## Roadmap
@@ -835,17 +853,14 @@ Extended database adapters: SQLite and SQL Server support, enhanced connection p
 
 Future versions may include:
 - gRPC integration
-- Advanced caching strategies
 - Enhanced monitoring and alerting
-- Database migrations
-- ORM-like features
 
 ## Documentation
 
 - [V2 Features Guide](./docs/V2_FEATURES.md) - Complete v2 features documentation
 - [V5.6 Features Guide](./docs/V5.6_FEATURES.md) - Advanced query builders documentation
 - [V5.7 Features Guide](./docs/V5.7_FEATURES.md) - ORM-like features and migrations documentation
-- [V5.7 Features Guide](./docs/V5.7_FEATURES.md) - ORM-like features and migrations documentation
+- [V5.8 Features Guide](./docs/V5.8_FEATURES.md) - Advanced caching strategies documentation
 - [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation

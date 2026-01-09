@@ -79,11 +79,13 @@ class ServiceClient {
               resolve(response);
             }
           } catch (err) {
-            resolve({
-              statusCode: res.statusCode,
-              headers: res.headers,
-              data: body,
-            });
+            // JSON parsing failed - reject with error instead of silently resolving
+            const parseError = new Error(`Failed to parse JSON response: ${err.message}`);
+            parseError.statusCode = res.statusCode;
+            parseError.headers = res.headers;
+            parseError.rawBody = body;
+            parseError.parseError = err;
+            reject(parseError);
           }
         });
       });

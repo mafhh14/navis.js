@@ -358,8 +358,58 @@ export interface RedisCache {
   size(): Promise<number>;
 }
 
+export interface AdvancedCacheOptions {
+  l1Cache?: Cache;
+  l2Cache?: RedisCache | any;
+  l1MaxSize?: number;
+  l1TTL?: number;
+  compressThreshold?: number;
+  writeStrategy?: 'write-through' | 'write-back' | 'write-around';
+  version?: string;
+}
+
+export interface AdvancedCacheSetOptions {
+  ttl?: number;
+  tags?: string[];
+  compress?: boolean;
+}
+
+export interface AdvancedCacheStats {
+  hits: number;
+  misses: number;
+  sets: number;
+  deletes: number;
+  errors: number;
+  l1Hits: number;
+  l2Hits: number;
+  total: number;
+  hitRate: string;
+  l1Size: number;
+  l2Size: number | string;
+  writeBackQueueSize: number;
+}
+
+export interface AdvancedCacheWarmItem {
+  key: string;
+  value: any;
+  options?: AdvancedCacheSetOptions;
+}
+
+export interface AdvancedCache {
+  get(key: string): Promise<any>;
+  set(key: string, value: any, options?: AdvancedCacheSetOptions): Promise<void>;
+  delete(key: string): Promise<void>;
+  invalidateByTag(tags: string | string[]): Promise<void>;
+  invalidateByPattern(pattern: string | RegExp): Promise<void>;
+  warm(items: AdvancedCacheWarmItem[]): Promise<void>;
+  getStats(): AdvancedCacheStats;
+  resetStats(): void;
+  clear(): Promise<void>;
+  flush(): Promise<void>;
+}
+
 export interface CacheMiddlewareOptions {
-  cacheStore: Cache | RedisCache;
+  cacheStore: Cache | RedisCache | AdvancedCache;
   ttl?: number;
   keyGenerator?: (req: NavisRequest) => string;
   skipCache?: (req: NavisRequest, res: NavisResponse) => boolean;
@@ -696,6 +746,10 @@ export const Cache: {
 
 export const RedisCache: {
   new (options?: RedisCacheOptions): RedisCache;
+};
+
+export const AdvancedCache: {
+  new (options?: AdvancedCacheOptions): AdvancedCache;
 };
 
 export const HealthChecker: {
