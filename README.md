@@ -197,7 +197,7 @@ navis metrics
 - ✅ **Complex queries** - Support for JOINs, nested WHERE conditions, GROUP BY, HAVING, ORDER BY
 - ✅ **Database-agnostic** - Automatic SQL dialect handling (PostgreSQL, MySQL, SQLite, SQL Server)
 
-### v5.7 (Current)
+### v5.7 ✅ (Current)
 - ✅ **ORM-like features** - Model definitions with relationships, hooks, and validation
 - ✅ **Database migrations** - Migration system with up/down support and tracking
 - ✅ **Model relationships** - hasMany, belongsTo, hasOne relationship definitions
