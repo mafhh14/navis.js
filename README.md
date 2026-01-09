@@ -835,6 +835,7 @@ Future versions may include:
 ## Documentation
 
 - [V2 Features Guide](./docs/V2_FEATURES.md) - Complete v2 features documentation
+- [V5.6 Features Guide](./docs/V5.6_FEATURES.md) - Advanced query builders documentation
 - [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation
