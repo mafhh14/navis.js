@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 5.8.3  
+**Version:** 5.9.0  
 **License:** MIT
 
 ## Philosophy
@@ -227,11 +227,19 @@ navis metrics
 ### v5.8.2 ✅
 - 📝 **Documentation** - Roadmap and version sync updates
 
-### v5.8.3 ✅ (Current)
+### v5.8.3 ✅
 - 🐛 **Bug fix** - Cache middleware now passes TTL correctly to `AdvancedCache` (options object) and `RedisCache` (seconds)
 - 🐛 **Bug fix** - `AdvancedCache.set()` accepts numeric TTL for compatibility with middleware and `Cache` API
 - 🐛 **Bug fix** - Middleware chain now invokes `res.finish()` so response caching actually stores results
 - ✅ **Verification** - Added `scripts/verify-v5.8.3.js` for cache middleware + AdvancedCache integration tests
+
+### v5.9.0 ✅ (Current)
+- ✅ **Mobile authentication** - Device ID + HMAC signature verification for mobile apps
+- ✅ **Face / biometric authentication** - Face ID, Touch ID, and fingerprint assertion tokens
+- ✅ **Bluetooth authentication** - BLE device challenge-response with registered device whitelist
+- ✅ **Combined device auth** - `authenticateDevice()` requiring mobile + face + bluetooth
+- ✅ **Challenge helpers** - `createMobileChallenge()`, `createBluetoothChallenge()`, `createBiometricToken()`
+- ✅ **Verification** - Added `scripts/verify-v5.9.js` and `examples/mobile-auth-demo.js`
 
 ## API Reference
 
@@ -827,6 +835,7 @@ See the `examples/` directory:
 - `orm-migrations-demo.ts` - ORM-like features and migrations example (v5.7) - TypeScript
 - `advanced-cache-demo.js` - Advanced caching strategies example (v5.8) - JavaScript
 - `advanced-cache-demo.ts` - Advanced caching strategies example (v5.8) - TypeScript
+- `mobile-auth-demo.js` - Mobile, face, and Bluetooth authentication example (v5.9)
 - `service-client-demo.js` - ServiceClient usage example
 
 ## Roadmap
@@ -879,8 +888,11 @@ Documentation: Enhanced README Philosophy section with comprehensive feature hig
 ### v5.8.2 ✅
 Documentation: Roadmap and version sync updates
 
-### v5.8.3 ✅ (Current)
+### v5.8.3 ✅
 Bug fixes: Cache middleware + AdvancedCache TTL compatibility, `res.finish()` invocation, integration verification
+
+### v5.9.0 ✅ (Current)
+Mobile, face (biometric), and Bluetooth device authentication with combined multi-factor middleware
 
 ## What's Next?
 
@@ -896,6 +908,7 @@ Future versions may include:
 - [V5.6 Features Guide](./docs/V5.6_FEATURES.md) - Advanced query builders documentation
 - [V5.7 Features Guide](./docs/V5.7_FEATURES.md) - ORM-like features and migrations documentation
 - [V5.8 Features Guide](./docs/V5.8_FEATURES.md) - Advanced caching strategies documentation (includes v5.8.3 fixes)
+- [V5.9 Features Guide](./docs/V5.9_FEATURES.md) - Mobile, face, and Bluetooth authentication documentation
 - [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation

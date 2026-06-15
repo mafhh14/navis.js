@@ -306,6 +306,63 @@ export interface AuthOptions {
   audience?: string;
 }
 
+export interface MobileAuthOptions {
+  secret?: string;
+  deviceIdHeader?: string;
+  signatureHeader?: string;
+  timestampHeader?: string;
+  maxAgeMs?: number;
+  validateDevice?: (deviceId: string, req: NavisRequest) => boolean | Promise<boolean>;
+}
+
+export interface BiometricAuthOptions {
+  secret?: string;
+  tokenHeader?: string;
+  allowedTypes?: Array<'face' | 'fingerprint' | 'biometric'>;
+  ttlSeconds?: number;
+}
+
+export interface BluetoothAuthOptions {
+  secret?: string;
+  deviceIdHeader?: string;
+  challengeHeader?: string;
+  signatureHeader?: string;
+  registeredDevices?: string[];
+  maxAgeMs?: number;
+  validateDevice?: (deviceId: string, req: NavisRequest) => boolean | Promise<boolean>;
+}
+
+export interface DeviceAuthOptions {
+  require?: Array<'mobile' | 'face' | 'biometric' | 'bluetooth'>;
+  mobile?: MobileAuthOptions;
+  face?: BiometricAuthOptions;
+  biometric?: BiometricAuthOptions;
+  bluetooth?: BluetoothAuthOptions;
+  secret?: string;
+}
+
+export interface MobileChallenge {
+  deviceId: string;
+  challenge: string;
+  timestamp: number;
+  expiresAt: number;
+}
+
+export interface BiometricTokenPayload {
+  sub: string;
+  type: string;
+  deviceId?: string | null;
+  iat: number;
+  exp: number;
+}
+
+export interface BluetoothChallenge {
+  bleDeviceId: string;
+  challenge: string;
+  serverSignature: string;
+  expiresAt: number;
+}
+
 export interface RateLimitOptions {
   windowMs?: number;
   max?: number;
@@ -905,6 +962,39 @@ export function authenticateJWT(options?: AuthOptions): Middleware;
 export function authenticateAPIKey(options?: AuthOptions): Middleware;
 export function authorize(roles: string[]): Middleware;
 export function optionalAuth(options?: AuthOptions): Middleware;
+export function verifyMobileSignature(params: {
+  deviceId: string;
+  signature: string;
+  timestamp: string | number;
+  secret: string;
+  maxAgeMs?: number;
+}): boolean;
+export function createMobileChallenge(deviceId: string, options?: MobileAuthOptions): MobileChallenge;
+export function createBiometricToken(
+  payload: { userId?: string; sub?: string; type?: string; deviceId?: string },
+  options?: BiometricAuthOptions
+): string;
+export function verifyBiometricToken(
+  token: string,
+  options?: BiometricAuthOptions
+): BiometricTokenPayload | null;
+export function verifyBluetoothSignature(params: {
+  deviceId: string;
+  challenge: string;
+  signature: string;
+  secret: string;
+  registeredDevices?: string[];
+}): boolean;
+export function createBluetoothChallenge(
+  bleDeviceId: string,
+  options?: BluetoothAuthOptions
+): BluetoothChallenge;
+export function authenticateMobile(options?: MobileAuthOptions): Middleware;
+export function authenticateFace(options?: BiometricAuthOptions): Middleware;
+export function authenticateBiometric(options?: BiometricAuthOptions): Middleware;
+export function authenticateBluetooth(options?: BluetoothAuthOptions): Middleware;
+export function authenticateDevice(options?: DeviceAuthOptions): Middleware;
+export function sign(secret: string, data: string): string;
 export function rateLimit(options?: RateLimitOptions): Middleware;
 export function errorHandler(): Middleware;
 export function asyncHandler(fn: RouteHandler): RouteHandler;
