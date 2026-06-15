@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 5.8.2  
+**Version:** 5.8.3  
 **License:** MIT
 
 ## Philosophy
@@ -221,8 +221,17 @@ navis metrics
 - ✅ **Cache stampede prevention** - Prevents concurrent requests for same key
 - ✅ **Cache versioning** - Support for cache schema migrations
 
-### v5.8.1 ✅ (Current)
+### v5.8.1 ✅
 - 📝 **Documentation** - Enhanced README Philosophy section with comprehensive feature highlights
+
+### v5.8.2 ✅
+- 📝 **Documentation** - Roadmap and version sync updates
+
+### v5.8.3 ✅ (Current)
+- 🐛 **Bug fix** - Cache middleware now passes TTL correctly to `AdvancedCache` (options object) and `RedisCache` (seconds)
+- 🐛 **Bug fix** - `AdvancedCache.set()` accepts numeric TTL for compatibility with middleware and `Cache` API
+- 🐛 **Bug fix** - Middleware chain now invokes `res.finish()` so response caching actually stores results
+- ✅ **Verification** - Added `scripts/verify-v5.8.3.js` for cache middleware + AdvancedCache integration tests
 
 ## API Reference
 
@@ -864,8 +873,14 @@ Bug fixes: ServiceClient JSON parsing error handling improvements
 ### v5.8 ✅
 Advanced caching strategies: Multi-level caching, cache warming, invalidation, statistics, compression
 
-### v5.8.1 ✅ (Current)
+### v5.8.1 ✅
 Documentation: Enhanced README Philosophy section with comprehensive feature highlights
+
+### v5.8.2 ✅
+Documentation: Roadmap and version sync updates
+
+### v5.8.3 ✅ (Current)
+Bug fixes: Cache middleware + AdvancedCache TTL compatibility, `res.finish()` invocation, integration verification
 
 ## What's Next?
 
@@ -880,7 +895,7 @@ Future versions may include:
 - [V2 Features Guide](./docs/V2_FEATURES.md) - Complete v2 features documentation
 - [V5.6 Features Guide](./docs/V5.6_FEATURES.md) - Advanced query builders documentation
 - [V5.7 Features Guide](./docs/V5.7_FEATURES.md) - ORM-like features and migrations documentation
-- [V5.8 Features Guide](./docs/V5.8_FEATURES.md) - Advanced caching strategies documentation
+- [V5.8 Features Guide](./docs/V5.8_FEATURES.md) - Advanced caching strategies documentation (includes v5.8.3 fixes)
 - [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation

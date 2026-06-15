@@ -1,9 +1,53 @@
 /**
  * Cache Middleware
  * v5: Response caching middleware
+ * v5.8.3: AdvancedCache, Redis, and in-memory Cache TTL compatibility
  */
 
-const crypto = require('crypto');
+/**
+ * Detect AdvancedCache instances (options-object TTL API)
+ * @param {*} store
+ * @returns {boolean}
+ */
+function isAdvancedCache(store) {
+  return store && typeof store.invalidateByTag === 'function' && typeof store.flush === 'function';
+}
+
+/**
+ * Detect Redis cache adapter (TTL in seconds)
+ * @param {*} store
+ * @returns {boolean}
+ */
+function isRedisCache(store) {
+  return store && typeof store.connect === 'function' && typeof store.disconnect === 'function';
+}
+
+/**
+ * Set a value using the correct TTL format for each cache store
+ * @param {*} cacheStore
+ * @param {string} key
+ * @param {*} value
+ * @param {number} ttlSeconds
+ * @returns {Promise<void>}
+ */
+async function setCacheValue(cacheStore, key, value, ttlSeconds) {
+  const ttlMs = ttlSeconds * 1000;
+
+  if (isAdvancedCache(cacheStore)) {
+    await cacheStore.set(key, value, { ttl: ttlMs });
+    return;
+  }
+
+  if (isRedisCache(cacheStore)) {
+    await cacheStore.set(key, value, ttlSeconds);
+    return;
+  }
+
+  const result = cacheStore.set(key, value, ttlMs);
+  if (result && typeof result.then === 'function') {
+    await result;
+  }
+}
 
 /**
  * Create cache middleware
@@ -84,11 +128,7 @@ function cache(options = {}) {
             headers: res.headers,
           };
 
-          if (cacheStore.set) {
-            await cacheStore.set(cacheKey, cacheValue, ttl * 1000);
-          } else {
-            cacheStore.set(cacheKey, cacheValue, ttl * 1000);
-          }
+          await setCacheValue(cacheStore, cacheKey, cacheValue, ttl);
         } catch (error) {
           console.error('Cache set error:', error);
         }

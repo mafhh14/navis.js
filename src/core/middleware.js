@@ -17,7 +17,11 @@ async function executeMiddleware(middlewares, req, res, finalHandler, isLambda =
     if (index >= middlewares.length) {
       // All middleware executed, run final handler
       if (finalHandler) {
-        return await finalHandler(req, res);
+        const result = await finalHandler(req, res);
+        if (typeof res.finish === 'function') {
+          await res.finish();
+        }
+        return result;
       }
       return;
     }

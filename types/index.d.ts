@@ -397,7 +397,7 @@ export interface AdvancedCacheWarmItem {
 
 export interface AdvancedCache {
   get(key: string): Promise<any>;
-  set(key: string, value: any, options?: AdvancedCacheSetOptions): Promise<void>;
+  set(key: string, value: any, options?: AdvancedCacheSetOptions | number): Promise<void>;
   delete(key: string): Promise<void>;
   invalidateByTag(tags: string | string[]): Promise<void>;
   invalidateByPattern(pattern: string | RegExp): Promise<void>;

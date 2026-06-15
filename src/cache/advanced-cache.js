@@ -127,10 +127,11 @@ class AdvancedCache {
    * @param {Object} options - Options (ttl, tags, compress)
    */
   async set(key, value, options = {}) {
+    const normalized = typeof options === 'number' ? { ttl: options } : (options || {});
     const fullKey = this.versionPrefix + key;
-    const ttl = options.ttl || null;
-    const tags = options.tags || [];
-    const shouldCompress = options.compress !== false;
+    const ttl = normalized.ttl || null;
+    const tags = normalized.tags || [];
+    const shouldCompress = normalized.compress !== false;
     
     // Compress if needed (always wrap in object for consistency)
     const processedValue = shouldCompress ? await this._compress(value) : { compressed: false, data: value };
