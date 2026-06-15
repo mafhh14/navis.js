@@ -45,8 +45,5 @@
   "homepage": "https://github.com/mafhh14/navis.js#readme",
   "engines": {
     "node": ">=14.0.0"
-  },
-  "dependencies": {
-    "navis.js": "^5.8.3"
   }
 }
