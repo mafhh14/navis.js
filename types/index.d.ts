@@ -816,6 +816,9 @@ export const Tracer: {
 export const AlertManager: {
   new (options?: AlertManagerOptions): AlertManager;
   webhookChannel(options: { url: string; headers?: Record<string, string> }): (alert: AlertPayload) => Promise<void>;
+  slackChannel(options: { webhookUrl: string; channel?: string; username?: string }): (alert: AlertPayload) => Promise<void>;
+  pagerDutyChannel(options: { routingKey: string; url?: string }): (alert: AlertPayload) => Promise<void>;
+  snsChannel(options: { topicArn: string; region?: string }): (alert: AlertPayload) => Promise<void>;
 };
 
 export const GrpcServer: {
@@ -1053,6 +1056,33 @@ export function authenticateBiometric(options?: BiometricAuthOptions): Middlewar
 export function authenticateBluetooth(options?: BluetoothAuthOptions): Middleware;
 export function authenticateDevice(options?: DeviceAuthOptions): Middleware;
 export function sign(secret: string, data: string): string;
+
+export interface WebAuthnStore {
+  saveCredential(credentialId: string, data: any): void;
+  getCredential(credentialId: string): any;
+  getCredentialsForUser(userId: string): any[];
+  clear(): void;
+}
+
+export interface WebAuthnOptions {
+  store?: WebAuthnStore;
+  rpName?: string;
+  rpId?: string;
+  userName?: string;
+  displayName?: string;
+  challengeTtlMs?: number;
+  timeout?: number;
+}
+
+export function createWebAuthnStore(): WebAuthnStore;
+export function createRegistrationOptions(userId: string, options?: WebAuthnOptions): any;
+export function completeRegistration(userId: string, response: any, options?: WebAuthnOptions): { credentialId: string; userId: string };
+export function createAuthenticationOptions(userId: string, options?: WebAuthnOptions): any;
+export function verifyAuthentication(userId: string, response: any, options?: WebAuthnOptions): { userId: string; credentialId: string; counter: number };
+export function authenticateWebAuthn(options?: WebAuthnOptions): Middleware;
+export function createTestCredential(userId: string, options?: WebAuthnOptions): any;
+export function signTestAuthentication(options: { userId: string; credentialId: string; privateKeyPem: string; store: WebAuthnStore }): { userId: string; credentialId: string; counter: number };
+
 export function rateLimit(options?: RateLimitOptions): Middleware;
 export function errorHandler(): Middleware;
 export function asyncHandler(fn: RouteHandler): RouteHandler;
@@ -1271,6 +1301,8 @@ export function createMigration(dbPool: DatabasePool, migrationsPath?: string): 
 export function createAlertManager(options?: AlertManagerOptions): AlertManager;
 export function createGrpcServer(options?: GrpcServerOptions): GrpcServer;
 export function createGrpcClient(address: string, serviceDefinition: any, options?: { secure?: boolean; clientOptions?: any }): any;
+export function loadProto(protoPath: string, options?: { loaderOptions?: Record<string, any>; includeDirs?: string[] }): any;
+export function loadProtoService(protoPath: string, packagePath: string | string[], options?: { loaderOptions?: Record<string, any>; includeDirs?: string[] }): any;
 export function createHealthChecker(options?: HealthCheckOptions): HealthChecker;
 export function gracefulShutdown(server: any, options?: GracefulShutdownOptions): any;
 export function getPool(): ServiceClientPool;

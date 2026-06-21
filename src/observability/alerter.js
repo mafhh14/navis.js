@@ -66,6 +66,105 @@ class AlertManager {
   }
 
   /**
+   * Slack incoming webhook channel
+   * @param {Object} options
+   * @returns {Function}
+   */
+  static slackChannel(options = {}) {
+    const { webhookUrl, channel, username = 'Navis Alerts' } = options;
+    if (!webhookUrl) {
+      throw new Error('Slack webhook URL is required');
+    }
+
+    return async (alert) => {
+      const payload = {
+        username,
+        channel,
+        text: `*[${alert.severity}] ${alert.name}*`,
+        attachments: [
+          {
+            color: alert.severity === 'critical' ? 'danger' : 'warning',
+            fields: [
+              { title: 'Message', value: alert.message, short: false },
+              { title: 'Metric', value: alert.metric, short: true },
+              { title: 'Value', value: String(alert.value), short: true },
+              { title: 'Threshold', value: String(alert.threshold), short: true },
+            ],
+            ts: Math.floor(new Date(alert.timestamp).getTime() / 1000),
+          },
+        ],
+      };
+      await postJson(webhookUrl, payload);
+    };
+  }
+
+  /**
+   * PagerDuty Events API v2 channel
+   * @param {Object} options
+   * @returns {Function}
+   */
+  static pagerDutyChannel(options = {}) {
+    const { routingKey, url = 'https://events.pagerduty.com/v2/enqueue' } = options;
+    if (!routingKey) {
+      throw new Error('PagerDuty routing key is required');
+    }
+
+    return async (alert) => {
+      const payload = {
+        routing_key: routingKey,
+        event_action: 'trigger',
+        dedup_key: alert.name,
+        payload: {
+          summary: alert.message,
+          severity: alert.severity === 'critical' ? 'critical' : 'warning',
+          source: 'navis.js',
+          custom_details: {
+            metric: alert.metric,
+            value: alert.value,
+            threshold: alert.threshold,
+            labels: alert.labels,
+          },
+        },
+      };
+      await postJson(url, payload);
+    };
+  }
+
+  /**
+   * AWS SNS notification channel
+   * @param {Object} options
+   * @returns {Function}
+   */
+  static snsChannel(options = {}) {
+    const { topicArn, region = process.env.AWS_REGION || 'us-east-1' } = options;
+    if (!topicArn) {
+      throw new Error('SNS topic ARN is required');
+    }
+
+    return async (alert) => {
+      let SNSClient;
+      let PublishCommand;
+      try {
+        ({ SNSClient } = require('@aws-sdk/client-sns'));
+        ({ PublishCommand } = require('@aws-sdk/client-sns'));
+      } catch (error) {
+        throw new Error(
+          'SNS alerts require: npm install @aws-sdk/client-sns'
+        );
+      }
+
+      const client = new SNSClient({ region });
+      await client.send(
+        new PublishCommand({
+          TopicArn: topicArn,
+          Subject: `[${alert.severity}] ${alert.name}`,
+          Message: JSON.stringify(alert, null, 2),
+        })
+      );
+    };
+  }
+
+  /**
    * Evaluate metrics and fire alerts
    * @param {Object} metrics - Metrics instance
    * @returns {Promise<Array>}

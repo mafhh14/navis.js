@@ -48,6 +48,17 @@ const {
   authenticateDevice,
   sign,
 } = require('./auth/mobile-auth');
+const {
+  WebAuthnStore,
+  createWebAuthnStore,
+  createRegistrationOptions,
+  completeRegistration,
+  createAuthenticationOptions,
+  verifyAuthentication,
+  authenticateWebAuthn,
+  createTestCredential,
+  signTestAuthentication,
+} = require('./auth/webauthn');
 const { rateLimit, RateLimiter } = require('./middleware/rate-limiter');
 const {
   AppError,
@@ -99,6 +110,7 @@ const {
 
 // v6: gRPC, DynamoDB, alerting, route middleware
 const { GrpcServer, createGrpcServer, createGrpcClient } = require('./grpc/grpc-server');
+const { loadProto, loadProtoService } = require('./grpc/proto-loader');
 
 module.exports = {
   // Core
@@ -154,6 +166,15 @@ module.exports = {
   authenticateBluetooth,
   authenticateDevice,
   sign,
+  WebAuthnStore,
+  createWebAuthnStore,
+  createRegistrationOptions,
+  completeRegistration,
+  createAuthenticationOptions,
+  verifyAuthentication,
+  authenticateWebAuthn,
+  createTestCredential,
+  signTestAuthentication,
   rateLimit,
   RateLimiter,
   AppError,
@@ -223,6 +244,8 @@ module.exports = {
   GrpcServer,
   createGrpcServer,
   createGrpcClient,
+  loadProto,
+  loadProtoService,
   
   // Utilities
   response: {

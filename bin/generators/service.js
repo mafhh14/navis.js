@@ -155,12 +155,22 @@ app.get('/api/users', (req, res) => {
 
   fs.writeFileSync(path.join(serviceDir, 'README.md'), readmeTemplate);
 
+  try {
+    const { generateDeployConfig } = require('../deploy/lambda');
+    generateDeployConfig(serviceDir, { stackName: serviceName });
+  } catch (e) {
+    // Non-fatal if deploy helper unavailable
+  }
+
   console.log(`✅ Service "${serviceName}" generated successfully!`);
   console.log(`📁 Location: ${serviceDir}`);
   console.log(`\nNext steps:`);
   console.log(`  cd ${serviceName}`);
   console.log(`  npm install`);
   console.log(`  npm start`);
+  console.log(`\nDeploy to Lambda:`);
+  console.log(`  navis deploy lambda --generate-only`);
+  console.log(`  navis deploy lambda --zip-only`);
 }
 
 module.exports = { generateService };

@@ -100,4 +100,4 @@ Requires: `npm install @grpc/grpc-js`
 npm test
 ```
 
-Runs `verify-v5.8.3.js`, `verify-v5.9.js`, and `verify-v6.0.js`.
+Runs `verify-v5.8.3.js`, `verify-v5.9.js`, `verify-v6.0.js`, and `verify-v6.1.js`.

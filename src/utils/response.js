@@ -3,17 +3,31 @@
  */
 
 /**
+ * Detect Navis Lambda mock response object (used by handleLambda)
+ * @param {Object} context
+ * @returns {boolean}
+ */
+function isNavisLambdaRes(context) {
+  return (
+    context &&
+    typeof context.writeHead !== 'function' &&
+    typeof context.end !== 'function' &&
+    ('statusCode' in context || 'body' in context || 'headers' in context)
+  );
+}
+
+/**
  * Send a unified response
- * @param {Object} context - Response context (res for Node.js, or Lambda context)
+ * @param {Object} context - Response context (res for Node.js, Navis Lambda res, or unused for API Gateway return)
  * @param {number} statusCode - HTTP status code
  * @param {Object|string} data - Response data
- * @param {boolean} isLambda - Whether this is a Lambda invocation
+ * @param {boolean} isLambda - Return API Gateway response object when true and context is not Navis Lambda res
  */
 function sendResponse(context, statusCode, data, isLambda = false) {
   const body = typeof data === 'string' ? data : JSON.stringify(data);
-  
-  if (isLambda) {
-    // Lambda response format
+  const bodyObject = typeof data === 'string' ? JSON.parse(data) : data;
+
+  if (isLambda && !isNavisLambdaRes(context)) {
     return {
       statusCode,
       headers: {
@@ -21,13 +35,22 @@ function sendResponse(context, statusCode, data, isLambda = false) {
       },
       body,
     };
-  } else {
-    // Node.js HTTP response
-    context.writeHead(statusCode, {
-      'Content-Type': 'application/json',
-    });
-    context.end(body);
   }
+
+  if (isNavisLambdaRes(context)) {
+    context.statusCode = statusCode;
+    context.headers = {
+      ...context.headers,
+      'Content-Type': 'application/json',
+    };
+    context.body = bodyObject;
+    return context;
+  }
+
+  context.writeHead(statusCode, {
+    'Content-Type': 'application/json',
+  });
+  context.end(body);
 }
 
 /**
@@ -53,4 +76,5 @@ module.exports = {
   sendResponse,
   success,
   error,
+  isNavisLambdaRes,
 };

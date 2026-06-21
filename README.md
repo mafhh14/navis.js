@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 6.0.0  
+**Version:** 7.0.0  
 **License:** MIT
 
 ## Philosophy
@@ -92,21 +92,192 @@ app.listen(3000);
 
 See `examples/server.ts` and `examples/typescript-features-demo.ts` for complete TypeScript examples.
 
-## CLI
+## CLI Reference & Help
+
+Run `navis` with no arguments (or `navis help`) to print available commands.
 
 ```bash
-# Start example server
-navis start
-
-# Generate a new microservice (v2)
-navis generate service my-service
-
-# Run verification tests (v3)
-navis test
-
-# Show metrics endpoint info (v3)
-navis metrics
+navis
+navis help
+navis --help
 ```
+
+### Command overview
+
+| Command | Description |
+|---------|-------------|
+| `navis start` | Start the bundled example HTTP server |
+| `navis generate service <name>` | Scaffold a new microservice (`service.js`, `lambda.js`, SAM template) |
+| `navis test` | Run the full verification test suite |
+| `navis metrics` | Show how to expose Prometheus metrics in your app |
+| `navis deploy lambda` | Generate SAM config, package zip, or deploy to AWS Lambda |
+
+### `navis start`
+
+Starts `examples/server.js` from the installed package or local repo.
+
+```bash
+navis start
+```
+
+Use this to explore Navis.js locally after `npm install navis.js` or `npm link`.
+
+### `navis generate service <name>`
+
+Creates a new service folder with HTTP + Lambda handlers and deploy files.
+
+```bash
+navis generate service user-api
+cd user-api
+npm install
+npm start
+```
+
+**Generated files:**
+
+| File | Purpose |
+|------|---------|
+| `service.js` | Local Node.js HTTP server |
+| `lambda.js` | AWS Lambda handler (`exports.handler`) |
+| `package.json` | Service dependencies |
+| `template.yaml` | AWS SAM template (v7) |
+| `samconfig.toml` | SAM deploy defaults (v7) |
+| `DEPLOY.md` | Lambda deployment instructions (v7) |
+| `README.md` | Service quick-start |
+
+### `navis test`
+
+Runs all verification scripts (v5.8.3 through v7.0).
+
+```bash
+navis test
+# equivalent:
+npm test
+```
+
+Individual suites:
+
+```bash
+node scripts/verify-v5.9.js
+node scripts/verify-v6.0.js
+node scripts/verify-v6.1.js
+node scripts/verify-v6.2.js
+node scripts/verify-v7.0.js
+```
+
+### `navis metrics`
+
+Prints guidance for wiring a `/metrics` route with the `Metrics` class. See [V3 Features Guide](./docs/V3_FEATURES.md) for observability details.
+
+### `navis deploy lambda`
+
+Deploy helpers for serverless workloads. Run from your service directory (where `lambda.js` lives).
+
+```bash
+# Generate SAM template + deploy docs only
+navis deploy lambda --generate-only
+
+# Create deployment.zip for manual upload
+navis deploy lambda --zip-only
+
+# Full SAM build + deploy (requires AWS SAM CLI)
+navis deploy lambda --guided
+
+# Deploy a different directory or entry file
+navis deploy lambda --dir ./my-service --entry lambda.js --stack my-api-stack
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--generate-only` | Write `template.yaml`, `samconfig.toml`, and `DEPLOY.md` |
+| `--zip-only` | Generate config (if missing) and create `deployment.zip` |
+| `--guided` | Run `sam deploy --guided` (interactive first-time setup) |
+| `--dir <path>` | Service directory (default: current directory) |
+| `--entry <file>` | Lambda entry file (default: `lambda.js`) |
+| `--stack <name>` | CloudFormation stack name (default: folder name) |
+
+**Prerequisites for full deploy:**
+
+- [AWS CLI](https://aws.amazon.com/cli/) configured (`aws configure`)
+- [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) (`sam --version`)
+
+If SAM is not installed, `--zip-only` still produces a zip you can upload with:
+
+```bash
+aws lambda update-function-code --function-name YOUR_FUNCTION --zip-file fileb://deployment.zip
+```
+
+### npm scripts
+
+When working inside the `navis.js` repo or a generated service:
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| `npm test` | `node scripts/run-tests.js` | Run all verification suites |
+| `npm start` | `node examples/server.js` | Start example server (repo only) |
+
+### Common workflows
+
+**1. New microservice → local dev → Lambda**
+
+```bash
+navis generate service orders-api
+cd orders-api
+npm install
+npm start
+navis deploy lambda --generate-only
+navis deploy lambda --zip-only
+```
+
+**2. Lambda handler with `response.success()` (v6.1+)**
+
+```javascript
+const { NavisApp, response } = require('navis.js');
+const app = new NavisApp();
+
+app.get('/hello', (req, res) => {
+  response.success(res, { message: 'Hello Lambda' });
+});
+
+exports.handler = (event) => app.handleLambda(event);
+```
+
+**3. Route-level middleware (v6.0+)**
+
+```javascript
+app.get('/users/:id', cache({ ttl: 60 }), authenticateJWT({ secret }), async (req, res) => {
+  res.body = { id: req.params.id };
+});
+```
+
+### Help & troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `npm` blocked on PowerShell | Use `npm.cmd` instead of `npm` |
+| `npm publish` asks for OTP | Run `npm.cmd publish --otp=YOUR_CODE` or use a granular token with publish + bypass 2FA |
+| Optional packages missing | Install only what you need — see table below |
+| `navis` not found after install | Run `npm link` from the repo, or use `npx navis` |
+| SAM deploy fails | Use `--generate-only` or `--zip-only` first; see `DEPLOY.md` in your service folder |
+| Tests appear to hang | Fixed in v6.1+ — run `npm test`; each suite exits cleanly |
+
+**Optional dependencies (install when needed):**
+
+| Feature | Packages |
+|---------|----------|
+| Redis cache | `redis` |
+| DynamoDB | `@aws-sdk/client-dynamodb` `@aws-sdk/lib-dynamodb` |
+| SNS alerts | `@aws-sdk/client-sns` |
+| gRPC | `@grpc/grpc-js` `@grpc/proto-loader` |
+| SQS / Kafka / NATS | See [V3 Features Guide](./docs/V3_FEATURES.md) |
+
+**Getting more help:**
+
+- Feature guides — [Documentation](#documentation) section below
+- Examples — `examples/` directory ([Examples](#examples))
+- Issues — [GitHub Issues](https://github.com/mafhh14/navis.js/issues)
 
 ## Features
 
@@ -241,12 +412,29 @@ navis metrics
 - ✅ **Challenge helpers** - `createMobileChallenge()`, `createBluetoothChallenge()`, `createBiometricToken()`
 - ✅ **Verification** - Added `scripts/verify-v5.9.js` and `examples/mobile-auth-demo.js`
 
-### v6.0.0 ✅ (Current)
+### v6.0.0 ✅
 - ✅ **Route-level middleware** - Express-style `app.get(path, middleware, handler)` support
 - ✅ **DynamoDB adapter** - AWS DynamoDB integration for serverless workloads
 - ✅ **Enhanced alerting** - `AlertManager` with metric rules and webhook notifications
 - ✅ **gRPC integration** - `GrpcServer`, `createGrpcServer()`, and `createGrpcClient()`
 - ✅ **Unified tests** - `npm test` runs all verification suites
+
+### v6.1.0 ✅
+- ✅ **Lambda response helpers** - `response.success()` / `response.error()` work with Navis Lambda `res` objects
+- ✅ **gRPC proto loading** - `loadProto()` and `loadProtoService()` for `.proto` files
+- ✅ **Examples** - `dynamodb-demo.js` and `grpc-demo.js`
+- ✅ **Test coverage** - Route middleware regression in `verify-v4.js`, `verify-v6.1.js`, Windows-safe `run-tests.js`
+
+### v6.2.0 ✅
+- ✅ **Slack alerts** - `AlertManager.slackChannel()` for incoming webhooks
+- ✅ **PagerDuty alerts** - `AlertManager.pagerDutyChannel()` Events API v2
+- ✅ **SNS alerts** - `AlertManager.snsChannel()` with optional AWS SDK
+
+### v7.0.0 ✅ (Current)
+- ✅ **WebAuthn / passkeys** - Registration, authentication, and `authenticateWebAuthn()` middleware
+- ✅ **Lambda deploy CLI** - `navis deploy lambda` generates SAM templates, packages zip, runs SAM deploy
+- ✅ **Service generator** - Auto-generates `template.yaml` and `DEPLOY.md` on `navis generate service`
+- ✅ **Examples** - `webauthn-demo.js`
 
 ## API Reference
 
@@ -254,13 +442,87 @@ navis metrics
 
 #### Methods
 
-- `app.use(fn)` - Register middleware
-- `app.get(path, handler)` - Register GET route
-- `app.post(path, handler)` - Register POST route
-- `app.put(path, handler)` - Register PUT route
-- `app.delete(path, handler)` - Register DELETE route
+- `app.use(fn)` - Register global middleware
+- `app.get(path, ...handlers)` - Register GET route (supports route-level middleware, v6+)
+- `app.post(path, ...handlers)` - Register POST route
+- `app.put(path, ...handlers)` - Register PUT route
+- `app.delete(path, ...handlers)` - Register DELETE route
+- `app.patch(path, ...handlers)` - Register PATCH route (v4+)
 - `app.listen(port, callback)` - Start HTTP server (Node.js)
 - `app.handleLambda(event)` - Handle AWS Lambda event
+- `app.setErrorHandler(fn)` - Set global error handler (v4+)
+
+Route handlers accept variadic middleware before the final handler:
+
+```javascript
+app.get('/users/:id', rateLimit(), authenticateJWT({ secret }), async (req, res) => {
+  res.body = { id: req.params.id };
+});
+```
+
+### Response Helpers (v6.1+ Lambda-compatible)
+
+```javascript
+const { response } = require('navis.js');
+
+// Works in Node.js HTTP and Lambda (auto-detects Navis res objects)
+response.success(res, { data: 'value' }, 200);
+response.error(res, 'Error message', 500);
+
+// Explicit API Gateway return (no res object)
+const lambdaResponse = response.success(null, { ok: true }, 200, true);
+```
+
+### WebAuthn / Passkeys (v7.0)
+
+```javascript
+const {
+  createWebAuthnStore,
+  createRegistrationOptions,
+  createAuthenticationOptions,
+  authenticateWebAuthn,
+} = require('navis.js');
+
+const store = createWebAuthnStore();
+
+app.post('/auth/register/options', (req, res) => {
+  response.success(res, createRegistrationOptions(req.body.userId, { store }));
+});
+
+app.get('/secure', authenticateWebAuthn({ store }), (req, res) => {
+  response.success(res, { user: req.webauthn.userId });
+});
+```
+
+See `examples/webauthn-demo.js` and [V7 Features Guide](./docs/V7_FEATURES.md).
+
+### Alerting (v6.0 / v6.2)
+
+```javascript
+const { Metrics, createAlertManager, AlertManager } = require('navis.js');
+
+const metrics = new Metrics();
+const alerts = createAlertManager();
+
+alerts.addRule({ name: 'high-errors', metric: 'http_errors', condition: 'gte', threshold: 10 });
+alerts.addChannel(AlertManager.slackChannel({ webhookUrl: process.env.SLACK_WEBHOOK_URL }));
+alerts.addChannel(AlertManager.pagerDutyChannel({ routingKey: process.env.PAGERDUTY_KEY }));
+
+await alerts.evaluate(metrics.getSnapshot());
+```
+
+See [V6 Features Guide](./docs/V6_FEATURES.md) and [V6.2 Features Guide](./docs/V6.2_FEATURES.md).
+
+### gRPC & DynamoDB (v6.0 / v6.1)
+
+```javascript
+const { loadProtoService, createGrpcServer, createPool } = require('navis.js');
+
+const HelloService = loadProtoService('./proto/hello.proto', 'hello.HelloService');
+const db = createPool({ type: 'dynamodb', region: 'us-east-1' });
+```
+
+See `examples/grpc-demo.js`, `examples/dynamodb-demo.js`, and [V6.1 Features Guide](./docs/V6.1_FEATURES.md).
 
 ### ServiceClient (v2 Enhanced)
 
@@ -329,12 +591,11 @@ const client = new ServiceClient(url);
 ```javascript
 const { response } = require('navis.js');
 
-// Success response
 response.success(res, { data: 'value' }, 200);
-
-// Error response
 response.error(res, 'Error message', 500);
 ```
+
+> **Note:** As of v6.1, `response.success()` and `response.error()` work with both Node.js HTTP `res` and Navis Lambda `res` objects. See [CLI Reference & Help](#cli-reference--help).
 
 ### GraphQL Support (v5.4)
 
@@ -843,6 +1104,9 @@ See the `examples/` directory:
 - `advanced-cache-demo.js` - Advanced caching strategies example (v5.8) - JavaScript
 - `advanced-cache-demo.ts` - Advanced caching strategies example (v5.8) - TypeScript
 - `mobile-auth-demo.js` - Mobile, face, and Bluetooth authentication example (v5.9)
+- `dynamodb-demo.js` - DynamoDB adapter example (v6.1)
+- `grpc-demo.js` - gRPC proto loading and server example (v6.1)
+- `webauthn-demo.js` - WebAuthn / passkey authentication example (v7.0)
 - `service-client-demo.js` - ServiceClient usage example
 
 ## Roadmap
@@ -901,16 +1165,24 @@ Bug fixes: Cache middleware + AdvancedCache TTL compatibility, `res.finish()` in
 ### v5.9.0 ✅
 Mobile, face (biometric), and Bluetooth device authentication with combined multi-factor middleware
 
-### v6.0.0 ✅ (Current)
+### v6.0.0 ✅
 Route-level middleware, DynamoDB adapter, metric alerting, gRPC integration, and unified npm test runner
+
+### v6.1.0 ✅
+Lambda response unification, gRPC proto loading, DynamoDB/gRPC demos, and expanded test coverage
+
+### v6.2.0 ✅
+Slack, PagerDuty, and SNS alert channels for AlertManager
+
+### v7.0.0 ✅ (Current)
+WebAuthn/passkey authentication and `navis deploy lambda` for AWS SAM deployment
 
 ## What's Next?
 
 Future versions may include:
-- Performance optimizations
+- Performance optimizations and Lambda cold-start improvements
 - Additional database adapters
-- WebAuthn / passkey authentication
-- Enhanced gRPC proto loading utilities
+- Docker deploy target for `navis deploy`
 
 ## Documentation
 
@@ -920,6 +1192,9 @@ Future versions may include:
 - [V5.8 Features Guide](./docs/V5.8_FEATURES.md) - Advanced caching strategies documentation (includes v5.8.3 fixes)
 - [V5.9 Features Guide](./docs/V5.9_FEATURES.md) - Mobile, face, and Bluetooth authentication documentation
 - [V6 Features Guide](./docs/V6_FEATURES.md) - Route middleware, DynamoDB, alerting, and gRPC documentation
+- [V6.1 Features Guide](./docs/V6.1_FEATURES.md) - Lambda response helpers and gRPC proto loading documentation
+- [V6.2 Features Guide](./docs/V6.2_FEATURES.md) - Slack, PagerDuty, and SNS alert channels documentation
+- [V7 Features Guide](./docs/V7_FEATURES.md) - WebAuthn/passkeys and Lambda deploy CLI documentation
 - [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation

@@ -1,6 +1,6 @@
 /**
  * Run all Navis.js verification scripts
- * v6.0: Unified test runner
+ * v6.1: Unified test runner (Windows-safe)
  */
 
 const { spawnSync } = require('child_process');
@@ -10,6 +10,9 @@ const scripts = [
   'verify-v5.8.3.js',
   'verify-v5.9.js',
   'verify-v6.0.js',
+  'verify-v6.1.js',
+  'verify-v6.2.js',
+  'verify-v7.0.js',
 ];
 
 let failed = 0;
@@ -20,8 +23,9 @@ for (const script of scripts) {
   const scriptPath = path.join(__dirname, script);
   console.log(`> node scripts/${script}`);
   const result = spawnSync(process.execPath, [scriptPath], {
-    stdio: 'inherit',
+    stdio: ['ignore', 'inherit', 'inherit'],
     cwd: path.join(__dirname, '..'),
+    windowsHide: true,
   });
 
   if (result.status !== 0) {

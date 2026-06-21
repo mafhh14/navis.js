@@ -222,4 +222,4 @@ async function run() {
   console.log('='.repeat(60));
 }
 
-run().catch(() => process.exit(1));
+run().then(() => process.exit(0)).catch(() => process.exit(1));

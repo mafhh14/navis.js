@@ -18,6 +18,7 @@ const {
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
+  response,
 } = require('../src/index');
 
 let testsPassed = 0;
@@ -90,77 +91,68 @@ test('AdvancedRouter - Route specificity', () => {
   }
 });
 
-// Test 4: Validation - Required Field
-testAsync('Validation - Required field', async () => {
-  const schema = {
-    body: {
-      name: { type: 'string', required: true },
-    },
-  };
-  
-  const middleware = validate(schema);
-  const req = { body: {} };
-  const res = { statusCode: 200, body: null };
-  
-  let errorThrown = false;
-  await middleware(req, res, () => {
-    throw new Error('Should not call next');
-  }).catch(() => {
-    errorThrown = true;
-  });
-  
-  if (!errorThrown) {
-    throw new Error('Validation should fail for missing required field');
-  }
-});
+// Test 4-6: Validation (async — run in runTests)
+async function runValidationTests() {
+  await testAsync('Validation - Required field', async () => {
+    const schema = {
+      body: {
+        name: { type: 'string', required: true },
+      },
+    };
 
-// Test 5: Validation - Type Check
-testAsync('Validation - Type check', async () => {
-  const schema = {
-    body: {
-      age: { type: 'number', required: true },
-    },
-  };
-  
-  const middleware = validate(schema);
-  const req = { body: { age: 'not-a-number' } };
-  const res = { statusCode: 200, body: null };
-  
-  let errorThrown = false;
-  await middleware(req, res, () => {
-    throw new Error('Should not call next');
-  }).catch(() => {
-    errorThrown = true;
-  });
-  
-  if (!errorThrown) {
-    throw new Error('Validation should fail for wrong type');
-  }
-});
+    const middleware = validate(schema);
+    const req = { body: {} };
+    const res = { statusCode: 200, body: null };
 
-// Test 6: Validation - Email Format
-testAsync('Validation - Email format', async () => {
-  const schema = {
-    body: {
-      email: { type: 'string', format: 'email', required: true },
-    },
-  };
-  
-  const middleware = validate(schema);
-  const req = { body: { email: 'not-an-email' } };
-  const res = { statusCode: 200, body: null };
-  
-  let errorThrown = false;
-  await middleware(req, res, () => {
-    throw new Error('Should not call next');
-  }).catch(() => {
-    errorThrown = true;
+    await middleware(req, res, () => {
+      throw new Error('Should not call next');
+    });
+
+    if (res.statusCode !== 400) {
+      throw new Error('Validation should fail for missing required field');
+    }
   });
-  
-  if (!errorThrown) {
-    throw new Error('Validation should fail for invalid email');
-  }
-});
+
+  await testAsync('Validation - Type check', async () => {
+    const schema = {
+      body: {
+        age: { type: 'number', required: true },
+      },
+    };
+
+    const middleware = validate(schema);
+    const req = { body: { age: 'not-a-number' } };
+    const res = { statusCode: 200, body: null };
+
+    await middleware(req, res, () => {
+      throw new Error('Should not call next');
+    });
+
+    if (res.statusCode !== 400) {
+      throw new Error('Validation should fail for wrong type');
+    }
+  });
+
+  await testAsync('Validation - Email format', async () => {
+    const schema = {
+      body: {
+        email: { type: 'string', format: 'email', required: true },
+      },
+    };
+
+    const middleware = validate(schema);
+    const req = { body: { email: 'not-an-email' } };
+    const res = { statusCode: 200, body: null };
+
+    await middleware(req, res, () => {
+      throw new Error('Should not call next');
+    });
+
+    if (res.statusCode !== 400) {
+      throw new Error('Validation should fail for invalid email');
+    }
+  });
+}
 
 // Test 7: Rate Limiter - Instantiation
 test('RateLimiter - Instantiation', () => {
@@ -270,10 +262,41 @@ test('Module exports - All v4 features exported', () => {
 // Run all tests
 async function runTests() {
   console.log('Running synchronous tests...\n');
-  
-  await Promise.all([
-    // Async tests
-  ]);
+
+  await runValidationTests();
+
+  await testAsync('NavisApp - Route-level middleware order', async () => {
+    const app = new NavisApp();
+    const order = [];
+
+    app.use((req, res, next) => {
+      order.push('global');
+      return next();
+    });
+
+    app.get('/items/:id', (req, res, next) => {
+      order.push('route');
+      return next();
+    }, async (req, res) => {
+      order.push('handler');
+      response.success(res, { id: req.params.id });
+    });
+
+    const lambdaResponse = await app.handleLambda({
+      httpMethod: 'GET',
+      path: '/items/42',
+      headers: {},
+    });
+
+    if (order.join(',') !== 'global,route,handler') {
+      throw new Error(`Wrong middleware order: ${order.join(',')}`);
+    }
+
+    const body = JSON.parse(lambdaResponse.body);
+    if (body.id !== '42') {
+      throw new Error('Route params not passed through middleware chain');
+    }
+  });
 
   console.log('\n' + '='.repeat(60));
   console.log(`\n📊 Test Results:`);

@@ -169,10 +169,11 @@ async function run() {
     }
   });
 
-  test('Package version - 6.0.0', () => {
+  test('Package version - 6.x+', () => {
     const pkg = require('../package.json');
-    if (pkg.version !== '6.0.0') {
-      throw new Error(`Expected version 6.0.0, got ${pkg.version}`);
+    const major = Number(pkg.version.split('.')[0]);
+    if (major < 6) {
+      throw new Error(`Expected version 6.x+, got ${pkg.version}`);
     }
   });
 
@@ -181,6 +182,4 @@ async function run() {
   console.log('='.repeat(60));
 }
 
-run().catch((error) => {
-  process.exit(1);
-});
+run().then(() => process.exit(0)).catch(() => process.exit(1));
