@@ -11,6 +11,7 @@ class DatabasePool {
     this.maxConnections = options.maxConnections || 10;
     this.minConnections = options.minConnections || 2;
     this.idleTimeout = options.idleTimeout || 30000;
+    this.region = options.region || process.env.AWS_REGION;
   }
 
   /**
@@ -40,6 +41,10 @@ class DatabasePool {
       case 'mssql':
       case 'sqlserver':
         await this._connectSQLServer();
+        break;
+      case 'dynamodb':
+      case 'dynamo':
+        await this._connectDynamoDB();
         break;
       default:
         throw new Error(`Unsupported database type: ${this.type}`);
@@ -145,6 +150,29 @@ class DatabasePool {
   }
 
   /**
+   * Connect to DynamoDB
+   * @private
+   */
+  async _connectDynamoDB() {
+    try {
+      const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+      const { DynamoDBDocumentClient } = require('@aws-sdk/lib-dynamodb');
+
+      const client = new DynamoDBClient({
+        region: this.region || process.env.AWS_REGION || 'us-east-1',
+        ...(this.connectionString ? { endpoint: this.connectionString } : {}),
+      });
+
+      this.pool = DynamoDBDocumentClient.from(client);
+      this.db = this.pool;
+    } catch (error) {
+      throw new Error(
+        'DynamoDB SDK not installed. Install with: npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb'
+      );
+    }
+  }
+
+  /**
    * Parse SQL Server connection string to config object
    * @private
    */
@@ -215,6 +243,9 @@ class DatabasePool {
     }
 
     switch (this.type.toLowerCase()) {
+      case 'dynamodb':
+      case 'dynamo':
+        return await this._dynamoOperation(query, params);
       case 'postgres':
       case 'postgresql':
         return await this.pool.query(query, params);
@@ -271,6 +302,10 @@ class DatabasePool {
     }
 
     if (this.type === 'mongodb' || this.type === 'sqlite' || this.type === 'sqlite3') {
+      return this.pool;
+    }
+
+    if (this.type === 'dynamodb' || this.type === 'dynamo') {
       return this.pool;
     }
 
@@ -333,11 +368,53 @@ class DatabasePool {
         case 'sqlserver':
           await this.pool.request().query('SELECT 1');
           return true;
+        case 'dynamodb':
+        case 'dynamo':
+          return !!this.pool;
         default:
           return false;
       }
     } catch (error) {
       return false;
+    }
+  }
+
+  /**
+   * Execute DynamoDB operation
+   * @param {string} table - Table name
+   * @param {Object} operation - { action, ...params }
+   * @private
+   */
+  async _dynamoOperation(table, operation = {}) {
+    const {
+      GetCommand,
+      PutCommand,
+      DeleteCommand,
+      ScanCommand,
+      QueryCommand,
+      UpdateCommand,
+    } = require('@aws-sdk/lib-dynamodb');
+
+    const action = operation.action || operation.type || 'get';
+    const input = { TableName: table, ...operation };
+    delete input.action;
+    delete input.type;
+
+    switch (action) {
+      case 'get':
+        return (await this.pool.send(new GetCommand(input))).Item;
+      case 'put':
+        return await this.pool.send(new PutCommand(input));
+      case 'delete':
+        return await this.pool.send(new DeleteCommand(input));
+      case 'scan':
+        return (await this.pool.send(new ScanCommand(input))).Items || [];
+      case 'query':
+        return (await this.pool.send(new QueryCommand(input))).Items || [];
+      case 'update':
+        return await this.pool.send(new UpdateCommand(input));
+      default:
+        throw new Error(`Unsupported DynamoDB action: ${action}`);
     }
   }
 }

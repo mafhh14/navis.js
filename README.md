@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 5.9.0  
+**Version:** 6.0.0  
 **License:** MIT
 
 ## Philosophy
@@ -233,13 +233,20 @@ navis metrics
 - 🐛 **Bug fix** - Middleware chain now invokes `res.finish()` so response caching actually stores results
 - ✅ **Verification** - Added `scripts/verify-v5.8.3.js` for cache middleware + AdvancedCache integration tests
 
-### v5.9.0 ✅ (Current)
+### v5.9.0 ✅
 - ✅ **Mobile authentication** - Device ID + HMAC signature verification for mobile apps
 - ✅ **Face / biometric authentication** - Face ID, Touch ID, and fingerprint assertion tokens
 - ✅ **Bluetooth authentication** - BLE device challenge-response with registered device whitelist
 - ✅ **Combined device auth** - `authenticateDevice()` requiring mobile + face + bluetooth
 - ✅ **Challenge helpers** - `createMobileChallenge()`, `createBluetoothChallenge()`, `createBiometricToken()`
 - ✅ **Verification** - Added `scripts/verify-v5.9.js` and `examples/mobile-auth-demo.js`
+
+### v6.0.0 ✅ (Current)
+- ✅ **Route-level middleware** - Express-style `app.get(path, middleware, handler)` support
+- ✅ **DynamoDB adapter** - AWS DynamoDB integration for serverless workloads
+- ✅ **Enhanced alerting** - `AlertManager` with metric rules and webhook notifications
+- ✅ **gRPC integration** - `GrpcServer`, `createGrpcServer()`, and `createGrpcClient()`
+- ✅ **Unified tests** - `npm test` runs all verification suites
 
 ## API Reference
 
@@ -891,16 +898,19 @@ Documentation: Roadmap and version sync updates
 ### v5.8.3 ✅
 Bug fixes: Cache middleware + AdvancedCache TTL compatibility, `res.finish()` invocation, integration verification
 
-### v5.9.0 ✅ (Current)
+### v5.9.0 ✅
 Mobile, face (biometric), and Bluetooth device authentication with combined multi-factor middleware
+
+### v6.0.0 ✅ (Current)
+Route-level middleware, DynamoDB adapter, metric alerting, gRPC integration, and unified npm test runner
 
 ## What's Next?
 
 Future versions may include:
-- gRPC integration
-- Enhanced monitoring and alerting
-- Additional database adapters
 - Performance optimizations
+- Additional database adapters
+- WebAuthn / passkey authentication
+- Enhanced gRPC proto loading utilities
 
 ## Documentation
 
@@ -909,6 +919,7 @@ Future versions may include:
 - [V5.7 Features Guide](./docs/V5.7_FEATURES.md) - ORM-like features and migrations documentation
 - [V5.8 Features Guide](./docs/V5.8_FEATURES.md) - Advanced caching strategies documentation (includes v5.8.3 fixes)
 - [V5.9 Features Guide](./docs/V5.9_FEATURES.md) - Mobile, face, and Bluetooth authentication documentation
+- [V6 Features Guide](./docs/V6_FEATURES.md) - Route middleware, DynamoDB, alerting, and gRPC documentation
 - [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation

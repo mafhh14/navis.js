@@ -181,8 +181,55 @@ export interface Metrics {
   gauge(name: string, value: number, labels?: Record<string, string>): void;
   histogram(name: string, value: number, labels?: Record<string, string>): void;
   recordRequest(method: string, path: string, duration: number, statusCode: number): void;
+  getSnapshot(): { counters: Record<string, number>; gauges: Record<string, number> };
+  getAll(): any;
   toPrometheus(): string;
   reset(): void;
+}
+
+export interface AlertRule {
+  name: string;
+  metric: string;
+  condition?: 'gt' | 'gte' | 'lt' | 'lte' | 'eq';
+  threshold: number;
+  labels?: Record<string, string>;
+  message?: string;
+  severity?: string;
+}
+
+export interface AlertPayload {
+  name: string;
+  severity: string;
+  message: string;
+  metric: string;
+  value: number;
+  threshold: number;
+  labels: Record<string, string>;
+  timestamp: string;
+}
+
+export interface AlertManagerOptions {
+  channels?: Array<(alert: AlertPayload) => void | Promise<void>>;
+  cooldownMs?: number;
+}
+
+export interface AlertManager {
+  addRule(rule: AlertRule): void;
+  removeRule(name: string): void;
+  addChannel(channel: (alert: AlertPayload) => void | Promise<void>): void;
+  evaluate(metrics: Metrics | { counters?: Record<string, number>; gauges?: Record<string, number> }): Promise<AlertPayload[]>;
+}
+
+export interface GrpcServerOptions {
+  host?: string;
+  port?: number;
+}
+
+export interface GrpcServer {
+  addService(serviceDefinition: any, implementation: Record<string, Function>): void;
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  getAddress(): string;
 }
 
 export interface TracerOptions {
@@ -644,8 +691,9 @@ export interface SSEServer {
 }
 
 export interface DatabasePoolOptions {
-  type?: 'postgres' | 'postgresql' | 'mysql' | 'mariadb' | 'mongodb' | 'sqlite' | 'sqlite3' | 'mssql' | 'sqlserver';
+  type?: 'postgres' | 'postgresql' | 'mysql' | 'mariadb' | 'mongodb' | 'sqlite' | 'sqlite3' | 'mssql' | 'sqlserver' | 'dynamodb' | 'dynamo';
   connectionString?: string;
+  region?: string;
   maxConnections?: number;
   minConnections?: number;
   idleTimeout?: number;
@@ -763,6 +811,16 @@ export const Metrics: {
 
 export const Tracer: {
   new (options?: TracerOptions): Tracer;
+};
+
+export const AlertManager: {
+  new (options?: AlertManagerOptions): AlertManager;
+  webhookChannel(options: { url: string; headers?: Record<string, string> }): (alert: AlertPayload) => Promise<void>;
+};
+
+export const GrpcServer: {
+  new (options?: GrpcServerOptions): GrpcServer;
+  unaryHandler(handler: (call: any) => any): (call: any, callback: Function) => void;
 };
 
 export const SQSMessaging: {
@@ -1210,6 +1268,9 @@ export class MigrationRunner {
 }
 
 export function createMigration(dbPool: DatabasePool, migrationsPath?: string): MigrationRunner;
+export function createAlertManager(options?: AlertManagerOptions): AlertManager;
+export function createGrpcServer(options?: GrpcServerOptions): GrpcServer;
+export function createGrpcClient(address: string, serviceDefinition: any, options?: { secure?: boolean; clientOptions?: any }): any;
 export function createHealthChecker(options?: HealthCheckOptions): HealthChecker;
 export function gracefulShutdown(server: any, options?: GracefulShutdownOptions): any;
 export function getPool(): ServiceClientPool;

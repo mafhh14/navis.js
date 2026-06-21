@@ -27,41 +27,52 @@ class NavisApp {
 
   /**
    * Register GET route
+   * @param {string} path
+   * @param {...Function} handlers - Optional middleware + final handler
    */
-  get(path, handler) {
-    this.router.get(path, handler);
+  get(path, ...handlers) {
+    this.router.get(path, ...handlers);
   }
 
   /**
    * Register POST route
    */
-  post(path, handler) {
-    this.router.post(path, handler);
+  post(path, ...handlers) {
+    this.router.post(path, ...handlers);
   }
 
   /**
    * Register PUT route
    */
-  put(path, handler) {
-    this.router.put(path, handler);
+  put(path, ...handlers) {
+    this.router.put(path, ...handlers);
   }
 
   /**
    * Register DELETE route
    */
-  delete(path, handler) {
-    this.router.delete(path, handler);
+  delete(path, ...handlers) {
+    this.router.delete(path, ...handlers);
   }
 
   /**
    * Register PATCH route (v4)
    */
-  patch(path, handler) {
+  patch(path, ...handlers) {
     if (this.router.patch) {
-      this.router.patch(path, handler);
+      this.router.patch(path, ...handlers);
     } else {
       throw new Error('PATCH method requires advanced router');
     }
+  }
+
+  /**
+   * Build middleware chain for a matched route
+   * @private
+   */
+  _routeMiddlewares(routeResult) {
+    const routeMiddlewares = routeResult.middlewares || [];
+    return [...this.middlewares, ...routeMiddlewares];
   }
 
   /**
@@ -97,9 +108,9 @@ class NavisApp {
         req.handler = routeResult.handler;
       }
     } else {
-      const handler = this.router.find(method, path);
-      if (handler) {
-        routeResult = { handler };
+      const match = this.router.find(method, path);
+      if (match) {
+        routeResult = { ...match, params: {} };
         req.params = {};
       }
     }
@@ -118,7 +129,7 @@ class NavisApp {
     // Execute middleware chain, then route handler
     try {
       await executeMiddleware(
-        this.middlewares,
+        this._routeMiddlewares(routeResult),
         req,
         res,
         routeResult.handler,
@@ -147,9 +158,9 @@ class NavisApp {
     if (this.useAdvancedRouter) {
       routeResult = this.router.find(method, path);
     } else {
-      const handler = this.router.find(method, path);
-      if (handler) {
-        routeResult = { handler, params: {} };
+      const match = this.router.find(method, path);
+      if (match) {
+        routeResult = { ...match, params: {} };
       }
     }
 
@@ -184,7 +195,7 @@ class NavisApp {
     // Execute middleware chain, then route handler
     try {
       const result = await executeMiddleware(
-        this.middlewares,
+        this._routeMiddlewares(routeResult),
         req,
         res,
         routeResult.handler,

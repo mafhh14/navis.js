@@ -1,7 +1,10 @@
 ﻿/**
  * Simple path-based router
  * v1: No regex, no params (keep it simple)
+ * v6.0: Route-level middleware support
  */
+
+const { parseRouteHandlers } = require('./route-utils');
 
 class Router {
   constructor() {
@@ -17,21 +20,22 @@ class Router {
    * Register a route handler
    * @param {string} method - HTTP method
    * @param {string} path - Route path (exact match only in v1)
-   * @param {Function} handler - Route handler function
+   * @param {...Function} handlers - Optional middleware + final handler
    */
-  register(method, path, handler) {
+  register(method, path, ...handlers) {
+    const { middlewares, handler } = parseRouteHandlers(handlers);
     const normalizedMethod = method.toUpperCase();
     if (!this.routes[normalizedMethod]) {
       throw new Error(`Unsupported HTTP method: ${method}`);
     }
-    this.routes[normalizedMethod][path] = handler;
+    this.routes[normalizedMethod][path] = { handler, middlewares };
   }
 
   /**
    * Get route handler for a method and path
    * @param {string} method - HTTP method
    * @param {string} path - Route path
-   * @returns {Function|null} - Route handler or null if not found
+   * @returns {Object|null} - { handler, middlewares } or null if not found
    */
   find(method, path) {
     const normalizedMethod = method.toUpperCase();
@@ -39,32 +43,20 @@ class Router {
     return methodRoutes[path] || null;
   }
 
-  /**
-   * Register GET route
-   */
-  get(path, handler) {
-    this.register('GET', path, handler);
+  get(path, ...handlers) {
+    this.register('GET', path, ...handlers);
   }
 
-  /**
-   * Register POST route
-   */
-  post(path, handler) {
-    this.register('POST', path, handler);
+  post(path, ...handlers) {
+    this.register('POST', path, ...handlers);
   }
 
-  /**
-   * Register PUT route
-   */
-  put(path, handler) {
-    this.register('PUT', path, handler);
+  put(path, ...handlers) {
+    this.register('PUT', path, ...handlers);
   }
 
-  /**
-   * Register DELETE route
-   */
-  delete(path, handler) {
-    this.register('DELETE', path, handler);
+  delete(path, ...handlers) {
+    this.register('DELETE', path, ...handlers);
   }
 }
 

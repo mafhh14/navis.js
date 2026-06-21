@@ -96,6 +96,27 @@ class Metrics {
   }
 
   /**
+   * Get flattened snapshot for alerting
+   * @returns {Object}
+   */
+  getSnapshot() {
+    const counters = {};
+    const gauges = {};
+
+    for (const [key, value] of this.metrics.counters.entries()) {
+      const { name } = this._parseKey(key);
+      counters[name] = (counters[name] || 0) + value;
+    }
+
+    for (const [key, value] of this.metrics.gauges.entries()) {
+      const { name } = this._parseKey(key);
+      gauges[name] = value;
+    }
+
+    return { counters, gauges };
+  }
+
+  /**
    * Get all metrics
    * @returns {Object} - All collected metrics
    */

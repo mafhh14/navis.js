@@ -15,6 +15,7 @@ const NATSMessaging = require('./messaging/nats-adapter');
 const Logger = require('./observability/logger');
 const Metrics = require('./observability/metrics');
 const Tracer = require('./observability/tracer');
+const { AlertManager, createAlertManager } = require('./observability/alerter');
 
 // v3.1: Lambda Optimizations
 const { getPool, ServiceClientPool } = require('./utils/service-client-pool');
@@ -96,6 +97,9 @@ const {
   createBatchResolver,
 } = require('./graphql/resolver');
 
+// v6: gRPC, DynamoDB, alerting, route middleware
+const { GrpcServer, createGrpcServer, createGrpcClient } = require('./grpc/grpc-server');
+
 module.exports = {
   // Core
   NavisApp,
@@ -117,6 +121,8 @@ module.exports = {
   Logger,
   Metrics,
   Tracer,
+  AlertManager,
+  createAlertManager,
   
   // v3.1: Lambda Optimizations
   ServiceClientPool,
@@ -212,6 +218,11 @@ module.exports = {
   combineResolvers,
   createAsyncResolver,
   createBatchResolver,
+
+  // v6: gRPC, alerting, DynamoDB
+  GrpcServer,
+  createGrpcServer,
+  createGrpcClient,
   
   // Utilities
   response: {

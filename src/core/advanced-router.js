@@ -1,7 +1,10 @@
 /**
  * Advanced Router with Parameters and Path Matching
  * v4: Support for route parameters, wildcards, and path matching
+ * v6.0: Route-level middleware support
  */
+
+const { parseRouteHandlers } = require('./route-utils');
 
 class AdvancedRouter {
   constructor() {
@@ -18,9 +21,10 @@ class AdvancedRouter {
    * Register a route handler
    * @param {string} method - HTTP method
    * @param {string} path - Route path (supports :param and * wildcards)
-   * @param {Function} handler - Route handler function
+   * @param {...Function} handlers - Optional middleware + final handler
    */
-  register(method, path, handler) {
+  register(method, path, ...handlers) {
+    const { middlewares, handler } = parseRouteHandlers(handlers);
     const normalizedMethod = method.toUpperCase();
     if (!this.routes[normalizedMethod]) {
       throw new Error(`Unsupported HTTP method: ${method}`);
@@ -33,6 +37,7 @@ class AdvancedRouter {
       pattern: path,
       regex: pattern.regex,
       params: pattern.params,
+      middlewares,
       handler,
     });
 
@@ -65,6 +70,7 @@ class AdvancedRouter {
 
         return {
           handler: route.handler,
+          middlewares: route.middlewares || [],
           params,
         };
       }
@@ -149,36 +155,24 @@ class AdvancedRouter {
   /**
    * Register GET route
    */
-  get(path, handler) {
-    this.register('GET', path, handler);
+  get(path, ...handlers) {
+    this.register('GET', path, ...handlers);
   }
 
-  /**
-   * Register POST route
-   */
-  post(path, handler) {
-    this.register('POST', path, handler);
+  post(path, ...handlers) {
+    this.register('POST', path, ...handlers);
   }
 
-  /**
-   * Register PUT route
-   */
-  put(path, handler) {
-    this.register('PUT', path, handler);
+  put(path, ...handlers) {
+    this.register('PUT', path, ...handlers);
   }
 
-  /**
-   * Register DELETE route
-   */
-  delete(path, handler) {
-    this.register('DELETE', path, handler);
+  delete(path, ...handlers) {
+    this.register('DELETE', path, ...handlers);
   }
 
-  /**
-   * Register PATCH route
-   */
-  patch(path, handler) {
-    this.register('PATCH', path, handler);
+  patch(path, ...handlers) {
+    this.register('PATCH', path, ...handlers);
   }
 }
 
