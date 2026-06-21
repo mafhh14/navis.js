@@ -190,6 +190,7 @@ class NavisApp {
       statusCode: 200,
       headers: {},
       body: null,
+      _navisLambda: true,
     };
 
     // Execute middleware chain, then route handler

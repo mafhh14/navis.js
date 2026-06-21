@@ -132,36 +132,38 @@ app.post('/cache/clear', (req, res) => {
 // Start Server
 // ============================================
 const PORT = 3000;
-const server = app.listen(PORT, () => {
-  console.log(`\n🚀 Navis.js v5 Features Demo Server`);
-  console.log(`📡 Listening on http://localhost:${PORT}\n`);
-  console.log('Available endpoints:');
-  console.log('  GET  /');
-  console.log('  GET  /users/:id (cached)');
-  console.log('  GET  /users/:id/posts');
-  console.log('  GET  /health/live (liveness)');
-  console.log('  GET  /health/ready (readiness)');
-  console.log('  GET  /cache-stats');
-  console.log('  POST /cache/clear');
-  console.log('\n💡 Test with:');
-  console.log('  curl http://localhost:3000/');
-  console.log('  curl http://localhost:3000/users/123');
-  console.log('  curl http://localhost:3000/health/ready');
-});
 
-// ============================================
-// Graceful Shutdown
-// ============================================
-gracefulShutdown(server, {
-  timeout: 10000,
-  onShutdown: async () => {
-    console.log('Cleaning up...');
-    // Close database connections
-    // Close cache connections
-    cacheStore.destroy();
-    console.log('Cleanup complete');
-  },
-});
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    console.log(`\n🚀 Navis.js v5 Features Demo Server`);
+    console.log(`📡 Listening on http://localhost:${PORT}\n`);
+    console.log('Available endpoints:');
+    console.log('  GET  /');
+    console.log('  GET  /users/:id (cached)');
+    console.log('  GET  /users/:id/posts');
+    console.log('  GET  /health/live (liveness)');
+    console.log('  GET  /health/ready (readiness)');
+    console.log('  GET  /cache-stats');
+    console.log('  POST /cache/clear');
+    console.log('\n💡 Test with:');
+    console.log('  curl http://localhost:3000/');
+    console.log('  curl http://localhost:3000/users/123');
+    console.log('  curl http://localhost:3000/health/ready');
+  });
+
+  gracefulShutdown(server, {
+    timeout: 10000,
+    onShutdown: async () => {
+      console.log('Cleaning up...');
+      cacheStore.destroy();
+      console.log('Cleanup complete');
+    },
+  });
+}
+
+// AWS Lambda handler (response.success works with Navis Lambda res — v6.1+)
+const handler = async (event) => app.handleLambda(event);
 
 module.exports = app;
+module.exports.handler = handler;
 

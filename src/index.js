@@ -5,11 +5,7 @@ const ServiceDiscovery = require('./utils/service-discovery');
 const CircuitBreaker = require('./utils/circuit-breaker');
 const { success, error } = require('./utils/response');
 const { retry, shouldRetryHttpStatus } = require('./utils/retry');
-
-// v3: Async Messaging
-const SQSMessaging = require('./messaging/sqs-adapter');
-const KafkaMessaging = require('./messaging/kafka-adapter');
-const NATSMessaging = require('./messaging/nats-adapter');
+const { applyLazyExports } = require('./utils/lazy-export');
 
 // v3: Observability
 const Logger = require('./observability/logger');
@@ -75,7 +71,6 @@ const {
 
 // v5: Enterprise Features
 const Cache = require('./cache/cache');
-const RedisCache = require('./cache/redis-cache');
 const AdvancedCache = require('./cache/advanced-cache');
 const cache = require('./middleware/cache-middleware');
 const cors = require('./middleware/cors');
@@ -85,57 +80,35 @@ const { HealthChecker, createHealthChecker } = require('./health/health-checker'
 const gracefulShutdown = require('./core/graceful-shutdown');
 
 // v5.1: Developer Experience
-const { SwaggerGenerator, swagger } = require('./docs/swagger');
 const { VersionManager, createVersionManager, headerVersioning } = require('./core/versioning');
 const { upload, saveFile } = require('./middleware/upload');
 const { TestApp, testApp } = require('./testing/test-helper');
 
 // v5.2: Real-time Features
-const WebSocketServer = require('./websocket/websocket-server');
 const { SSEServer, createSSEServer, sse } = require('./sse/server-sent-events');
 const { DatabasePool, createPool, queryBuilder, mongoQueryBuilder } = require('./db/db-pool');
 const { Model } = require('./db/model');
 const { Migration, createMigration } = require('./db/migration');
 
-// v5.4: GraphQL Support
-const { GraphQLServer, GraphQLError, createGraphQLServer, graphql } = require('./graphql/graphql-server');
-const { GraphQLSchema, createSchema, type, scalars, types } = require('./graphql/schema');
-const {
-  createResolver,
-  fieldResolver,
-  combineResolvers,
-  createAsyncResolver,
-  createBatchResolver,
-} = require('./graphql/resolver');
-
-// v6: gRPC, DynamoDB, alerting, route middleware
-const { GrpcServer, createGrpcServer, createGrpcClient } = require('./grpc/grpc-server');
-const { loadProto, loadProtoService } = require('./grpc/proto-loader');
-
-module.exports = {
+const api = {
   // Core
   NavisApp,
-  
+
   // Service Client (v2 enhanced)
   ServiceClient,
-  
+
   // v2 Features
   ServiceConfig,
   ServiceDiscovery,
   CircuitBreaker,
-  
-  // v3: Async Messaging
-  SQSMessaging,
-  KafkaMessaging,
-  NATSMessaging,
-  
+
   // v3: Observability
   Logger,
   Metrics,
   Tracer,
   AlertManager,
   createAlertManager,
-  
+
   // v3.1: Lambda Optimizations
   ServiceClientPool,
   getPool,
@@ -143,7 +116,7 @@ module.exports = {
   createLazyInit,
   LambdaHandler,
   coldStartTracker,
-  
+
   // v4: Advanced Features
   AdvancedRouter,
   validate,
@@ -187,10 +160,9 @@ module.exports = {
   errorHandler,
   asyncHandler,
   notFoundHandler,
-  
+
   // v5: Enterprise Features
   Cache,
-  RedisCache,
   AdvancedCache,
   cache,
   cors,
@@ -199,10 +171,8 @@ module.exports = {
   HealthChecker,
   createHealthChecker,
   gracefulShutdown,
-  
+
   // v5.1: Developer Experience
-  SwaggerGenerator,
-  swagger,
   VersionManager,
   createVersionManager,
   headerVersioning,
@@ -210,9 +180,8 @@ module.exports = {
   saveFile,
   TestApp,
   testApp,
-  
+
   // v5.2: Real-time Features
-  WebSocketServer,
   SSEServer,
   createSSEServer,
   sse,
@@ -223,30 +192,7 @@ module.exports = {
   Model,
   Migration,
   createMigration,
-  
-  // v5.4: GraphQL Support
-  GraphQLServer,
-  GraphQLError,
-  createGraphQLServer,
-  graphql,
-  GraphQLSchema,
-  createSchema,
-  type,
-  scalars,
-  types,
-  createResolver,
-  fieldResolver,
-  combineResolvers,
-  createAsyncResolver,
-  createBatchResolver,
 
-  // v6: gRPC, alerting, DynamoDB
-  GrpcServer,
-  createGrpcServer,
-  createGrpcClient,
-  loadProto,
-  loadProtoService,
-  
   // Utilities
   response: {
     success,
@@ -257,3 +203,8 @@ module.exports = {
     shouldRetryHttpStatus,
   },
 };
+
+// v7.1: Lazy-load optional/heavy modules (messaging, GraphQL, gRPC, Redis, WebSocket, Swagger)
+applyLazyExports(api);
+
+module.exports = api;

@@ -1,6 +1,6 @@
 ﻿/**
  * Navis.js CLI
- * v7.0: Deploy command for AWS Lambda
+ * v7.1: Docker deploy + Lambda deploy
  */
 
 const { spawn } = require('child_process');
@@ -11,7 +11,7 @@ const command = process.argv[2];
 const isHelp = !command || command === 'help' || command === '--help' || command === '-h';
 
 function printHelp() {
-  console.log('Navis.js CLI v7.0');
+  console.log('Navis.js CLI v7.1');
   console.log('');
   console.log('Usage: navis <command> [options]');
   console.log('');
@@ -21,9 +21,10 @@ function printHelp() {
   console.log('  test                           Run verification test suites');
   console.log('  metrics                        Show Prometheus metrics setup help');
   console.log('  deploy lambda [options]        Deploy to AWS Lambda');
+  console.log('  deploy docker [options]        Build/push Docker image');
   console.log('  help                           Show this help message');
   console.log('');
-  console.log('Deploy options:');
+  console.log('Lambda deploy options:');
   console.log('  --generate-only                Create template.yaml and DEPLOY.md');
   console.log('  --zip-only                     Package deployment.zip');
   console.log('  --guided                       Run sam deploy --guided');
@@ -31,13 +32,58 @@ function printHelp() {
   console.log('  --entry <file>                 Lambda entry (default: lambda.js)');
   console.log('  --stack <name>                 CloudFormation stack name');
   console.log('');
+  console.log('Docker deploy options:');
+  console.log('  --generate-only                Create Dockerfile and docker-compose.yml');
+  console.log('  --build                        Build Docker image');
+  console.log('  --push                         Push image (implies --build)');
+  console.log('  --tag <name>                   Image tag (default: folder-name:latest)');
+  console.log('  --port <number>                Exposed port (default: 3000)');
+  console.log('  --entry <file>                 App entry (default: service.js)');
+  console.log('');
   console.log('Examples:');
   console.log('  navis generate service user-api');
   console.log('  navis deploy lambda --generate-only');
-  console.log('  navis deploy lambda --zip-only');
-  console.log('  navis deploy lambda --guided');
+  console.log('  navis deploy docker --generate-only');
+  console.log('  navis deploy docker --build --tag my-api:latest');
+  console.log('  navis deploy docker --build --push --tag registry.io/my-api:latest');
   console.log('');
   console.log('Documentation: https://github.com/mafhh14/navis.js#cli-reference--help');
+}
+
+function parseDeployOptions(args) {
+  const options = { dir: process.cwd() };
+
+  for (let i = 0; i < args.length; i += 1) {
+    if (args[i] === '--dir' && args[i + 1]) {
+      options.dir = path.resolve(args[i + 1]);
+      i += 1;
+    } else if (args[i] === '--entry' && args[i + 1]) {
+      options.entry = args[i + 1];
+      i += 1;
+    } else if (args[i] === '--stack' && args[i + 1]) {
+      options.stackName = args[i + 1];
+      i += 1;
+    } else if (args[i] === '--tag' && args[i + 1]) {
+      options.tag = args[i + 1];
+      i += 1;
+    } else if (args[i] === '--port' && args[i + 1]) {
+      options.port = Number(args[i + 1]);
+      i += 1;
+    } else if (args[i] === '--zip-only') {
+      options.zipOnly = true;
+    } else if (args[i] === '--guided') {
+      options.guided = true;
+    } else if (args[i] === '--generate-only') {
+      options.generateOnly = true;
+    } else if (args[i] === '--build') {
+      options.build = true;
+    } else if (args[i] === '--push') {
+      options.push = true;
+      options.build = true;
+    }
+  }
+
+  return options;
 }
 
 if (isHelp) {
@@ -89,32 +135,13 @@ if (command === 'start') {
   }
 } else if (command === 'deploy') {
   const target = process.argv[3] || 'lambda';
-  const { deployLambda, generateDeployConfig, packageLambda } = require('./deploy/lambda');
-
   const args = process.argv.slice(4);
-  const options = { dir: process.cwd() };
-
-  for (let i = 0; i < args.length; i += 1) {
-    if (args[i] === '--dir' && args[i + 1]) {
-      options.dir = path.resolve(args[i + 1]);
-      i += 1;
-    } else if (args[i] === '--entry' && args[i + 1]) {
-      options.entry = args[i + 1];
-      i += 1;
-    } else if (args[i] === '--stack' && args[i + 1]) {
-      options.stackName = args[i + 1];
-      i += 1;
-    } else if (args[i] === '--zip-only') {
-      options.zipOnly = true;
-    } else if (args[i] === '--guided') {
-      options.guided = true;
-    } else if (args[i] === '--generate-only') {
-      options.generateOnly = true;
-    }
-  }
+  const options = parseDeployOptions(args);
 
   try {
     if (target === 'lambda') {
+      const { deployLambda, generateDeployConfig, packageLambda } = require('./deploy/lambda');
+
       if (options.generateOnly) {
         const config = generateDeployConfig(options.dir, options);
         console.log('✅ Deploy config generated:');
@@ -127,9 +154,12 @@ if (command === 'start') {
       } else {
         deployLambda(options);
       }
+    } else if (target === 'docker') {
+      const { deployDocker } = require('./deploy/docker');
+      deployDocker(options);
     } else {
       console.error(`Unknown deploy target: ${target}`);
-      console.log('Usage: navis deploy lambda [--dir <path>] [--zip-only] [--guided] [--generate-only]');
+      console.log('Usage: navis deploy lambda|docker [options]');
       process.exit(1);
     }
   } catch (error) {

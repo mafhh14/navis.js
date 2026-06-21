@@ -39,15 +39,29 @@ console.log('='.repeat(60));
 
 async function run() {
   test('Response - isNavisLambdaRes detection', () => {
-    const lambdaRes = { statusCode: 200, headers: {}, body: null };
+    const lambdaRes = { statusCode: 200, headers: {}, body: null, _navisLambda: true };
     const httpRes = { writeHead: () => {}, end: () => {} };
     if (!isNavisLambdaRes(lambdaRes) || isNavisLambdaRes(httpRes)) {
       throw new Error('Lambda res detection failed');
     }
   });
 
+  test('Response - isNavisLambdaRes with middleware wrappers', () => {
+    const lambdaRes = {
+      statusCode: 200,
+      headers: {},
+      body: null,
+      _navisLambda: true,
+      end: () => {},
+      finish: async () => {},
+    };
+    if (!isNavisLambdaRes(lambdaRes)) {
+      throw new Error('Lambda res should be detected even with end/finish wrappers');
+    }
+  });
+
   test('Response - success() on Navis Lambda res', () => {
-    const res = { statusCode: 200, headers: {}, body: null };
+    const res = { statusCode: 200, headers: {}, body: null, _navisLambda: true };
     success(res, { ok: true });
     if (res.statusCode !== 200 || !res.body.ok) {
       throw new Error('success() did not set Lambda res body');
@@ -55,7 +69,7 @@ async function run() {
   });
 
   test('Response - error() on Navis Lambda res', () => {
-    const res = { statusCode: 200, headers: {}, body: null };
+    const res = { statusCode: 200, headers: {}, body: null, _navisLambda: true };
     error(res, 'bad request', 400);
     if (res.statusCode !== 400 || res.body.error !== 'bad request') {
       throw new Error('error() did not set Lambda res correctly');

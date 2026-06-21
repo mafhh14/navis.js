@@ -162,6 +162,13 @@ app.get('/api/users', (req, res) => {
     // Non-fatal if deploy helper unavailable
   }
 
+  try {
+    const { generateDockerConfig } = require('../deploy/docker');
+    generateDockerConfig(serviceDir, { entry: 'service.js', imageName: serviceName });
+  } catch (e) {
+    // Non-fatal
+  }
+
   console.log(`✅ Service "${serviceName}" generated successfully!`);
   console.log(`📁 Location: ${serviceDir}`);
   console.log(`\nNext steps:`);
@@ -171,6 +178,9 @@ app.get('/api/users', (req, res) => {
   console.log(`\nDeploy to Lambda:`);
   console.log(`  navis deploy lambda --generate-only`);
   console.log(`  navis deploy lambda --zip-only`);
+  console.log(`\nDeploy with Docker:`);
+  console.log(`  navis deploy docker --generate-only`);
+  console.log(`  navis deploy docker --build`);
 }
 
 module.exports = { generateService };

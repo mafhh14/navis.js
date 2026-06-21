@@ -8,12 +8,7 @@
  * @returns {boolean}
  */
 function isNavisLambdaRes(context) {
-  return (
-    context &&
-    typeof context.writeHead !== 'function' &&
-    typeof context.end !== 'function' &&
-    ('statusCode' in context || 'body' in context || 'headers' in context)
-  );
+  return context && context._navisLambda === true;
 }
 
 /**

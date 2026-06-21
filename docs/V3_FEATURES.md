@@ -271,8 +271,20 @@ navis test
 # Show metrics endpoint info
 navis metrics
 
-# Deploy service (coming soon)
-navis deploy
+# Deploy service
+
+```bash
+# AWS Lambda (SAM)
+navis deploy lambda --generate-only
+navis deploy lambda --zip-only
+navis deploy lambda --guided
+
+# Docker
+navis deploy docker --generate-only
+navis deploy docker --build --tag my-service:latest
+```
+
+See [V7 Features Guide](./V7_FEATURES.md) and [V7.1 Features Guide](./V7.1_FEATURES.md).
 ```
 
 ## Complete Example

@@ -3,7 +3,7 @@
 A lightweight, serverless-first, microservice API framework designed for AWS Lambda and Node.js.
 
 **Author:** Syed Imran Ali  
-**Version:** 7.0.1  
+**Version:** 7.1.0  
 **License:** MIT
 
 ## Philosophy
@@ -111,6 +111,7 @@ navis --help
 | `navis test` | Run the full verification test suite |
 | `navis metrics` | Show how to expose Prometheus metrics in your app |
 | `navis deploy lambda` | Generate SAM config, package zip, or deploy to AWS Lambda |
+| `navis deploy docker` | Generate Dockerfile, build image, or push to registry |
 
 ### `navis start`
 
@@ -143,11 +144,14 @@ npm start
 | `template.yaml` | AWS SAM template (v7) |
 | `samconfig.toml` | SAM deploy defaults (v7) |
 | `DEPLOY.md` | Lambda deployment instructions (v7) |
+| `Dockerfile` | Docker image definition (v7.1) |
+| `docker-compose.yml` | Local Docker orchestration (v7.1) |
+| `DOCKER_DEPLOY.md` | Docker deployment instructions (v7.1) |
 | `README.md` | Service quick-start |
 
 ### `navis test`
 
-Runs all verification scripts (v5.8.3 through v7.0).
+Runs all verification scripts (v4 through v7.1).
 
 ```bash
 navis test
@@ -158,11 +162,13 @@ npm test
 Individual suites:
 
 ```bash
+node scripts/verify-v4.js
 node scripts/verify-v5.9.js
 node scripts/verify-v6.0.js
 node scripts/verify-v6.1.js
 node scripts/verify-v6.2.js
 node scripts/verify-v7.0.js
+node scripts/verify-v7.1.js
 ```
 
 ### `navis metrics`
@@ -209,6 +215,38 @@ If SAM is not installed, `--zip-only` still produces a zip you can upload with:
 aws lambda update-function-code --function-name YOUR_FUNCTION --zip-file fileb://deployment.zip
 ```
 
+### `navis deploy docker`
+
+Container deployment for Node.js services. Run from your service directory (where `service.js` lives).
+
+```bash
+# Generate Dockerfile + docker-compose.yml
+navis deploy docker --generate-only
+
+# Build image locally
+navis deploy docker --build --tag my-api:latest
+
+# Build and push to registry
+navis deploy docker --build --push --tag registry.io/my-api:latest
+
+# Custom port and entry
+navis deploy docker --generate-only --entry server.js --port 8080
+```
+
+**Options:**
+
+| Flag | Description |
+|------|-------------|
+| `--generate-only` | Write `Dockerfile`, `.dockerignore`, `docker-compose.yml`, `DOCKER_DEPLOY.md` |
+| `--build` | Run `docker build` |
+| `--push` | Run `docker push` (implies `--build`) |
+| `--tag <name>` | Image tag (default: `folder-name:latest`) |
+| `--port <number>` | Exposed port (default: `3000`) |
+| `--entry <file>` | App entry file (default: `service.js`) |
+| `--dir <path>` | Service directory (default: current directory) |
+
+**Prerequisites:** [Docker](https://docs.docker.com/get-docker/) (`docker --version`)
+
 ### npm scripts
 
 When working inside the `navis.js` repo or a generated service:
@@ -229,6 +267,8 @@ npm install
 npm start
 navis deploy lambda --generate-only
 navis deploy lambda --zip-only
+navis deploy docker --generate-only
+navis deploy docker --build
 ```
 
 **2. Lambda handler with `response.success()` (v6.1+)**
@@ -430,11 +470,18 @@ app.get('/users/:id', cache({ ttl: 60 }), authenticateJWT({ secret }), async (re
 - ✅ **PagerDuty alerts** - `AlertManager.pagerDutyChannel()` Events API v2
 - ✅ **SNS alerts** - `AlertManager.snsChannel()` with optional AWS SDK
 
-### v7.0.0 ✅ (Current)
+### v7.0.0 ✅
 - ✅ **WebAuthn / passkeys** - Registration, authentication, and `authenticateWebAuthn()` middleware
 - ✅ **Lambda deploy CLI** - `navis deploy lambda` generates SAM templates, packages zip, runs SAM deploy
 - ✅ **Service generator** - Auto-generates `template.yaml` and `DEPLOY.md` on `navis generate service`
 - ✅ **Examples** - `webauthn-demo.js`
+
+### v7.1.0 ✅ (Current)
+- ✅ **Docker deploy CLI** - `navis deploy docker` generates Dockerfile, builds and pushes images
+- ✅ **Lambda cold-start optimization** - Lazy-load optional modules (gRPC, GraphQL, messaging, Redis, WebSocket)
+- ✅ **Test coverage** - `verify-v4.js` in `npm test`, `verify-v7.1.js` suite
+- ✅ **Demo fix** - `v5-features-demo.js` Lambda handler with `response.success()` on cached routes
+- ✅ **Docs sync** - V3 deploy docs updated, service generator includes Docker files
 
 ## API Reference
 
@@ -1174,15 +1221,18 @@ Lambda response unification, gRPC proto loading, DynamoDB/gRPC demos, and expand
 ### v6.2.0 ✅
 Slack, PagerDuty, and SNS alert channels for AlertManager
 
-### v7.0.0 ✅ (Current)
+### v7.0.0 ✅
 WebAuthn/passkey authentication and `navis deploy lambda` for AWS SAM deployment
+
+### v7.1.0 ✅ (Current)
+Docker deploy CLI, Lambda lazy-loading for cold starts, and expanded test coverage
 
 ## What's Next?
 
 Future versions may include:
-- Performance optimizations and Lambda cold-start improvements
-- Additional database adapters
-- Docker deploy target for `navis deploy`
+- Performance profiling and bundle size tooling
+- Additional database adapters (Cosmos DB, Firestore)
+- Real WebAuthn via optional `@simplewebauthn/server` integration
 
 ## Documentation
 
@@ -1195,6 +1245,7 @@ Future versions may include:
 - [V6.1 Features Guide](./docs/V6.1_FEATURES.md) - Lambda response helpers and gRPC proto loading documentation
 - [V6.2 Features Guide](./docs/V6.2_FEATURES.md) - Slack, PagerDuty, and SNS alert channels documentation
 - [V7 Features Guide](./docs/V7_FEATURES.md) - WebAuthn/passkeys and Lambda deploy CLI documentation
+- [V7.1 Features Guide](./docs/V7.1_FEATURES.md) - Docker deploy and Lambda cold-start optimizations documentation
 - [V3 Features Guide](./docs/V3_FEATURES.md) - Complete v3 features documentation
 - [V4 Features Guide](./docs/V4_FEATURES.md) - Complete v4 features documentation
 - [V5 Features Guide](./docs/V5_FEATURES.md) - Complete v5 features documentation

@@ -7,12 +7,14 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 
 const scripts = [
+  'verify-v4.js',
   'verify-v5.8.3.js',
   'verify-v5.9.js',
   'verify-v6.0.js',
   'verify-v6.1.js',
   'verify-v6.2.js',
   'verify-v7.0.js',
+  'verify-v7.1.js',
 ];
 
 let failed = 0;

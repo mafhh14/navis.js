@@ -158,10 +158,11 @@ async function run() {
     }
   });
 
-  test('Package version - 7.0.1', () => {
+  test('Package version - 7.x+', () => {
     const pkg = require('../package.json');
-    if (pkg.version !== '7.0.1') {
-      throw new Error(`Expected version 7.0.1, got ${pkg.version}`);
+    const major = Number(pkg.version.split('.')[0]);
+    if (major < 7) {
+      throw new Error(`Expected version 7.x+, got ${pkg.version}`);
     }
   });
 
